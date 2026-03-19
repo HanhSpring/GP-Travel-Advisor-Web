@@ -1,0 +1,59 @@
+import React from 'react';
+import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import LoginPage from '../pages/auth/Login';
+import RegisterPage from '../pages/auth/Register';
+import DashboardPage from '../pages/provider/Dashboard';
+import LocationsPage from '../pages/provider/Locations';
+import LocationEditPage from '../pages/provider/Locations/[id]';
+import AddLocationPage from '../pages/provider/AddLocation';
+import ProfilePage from '../pages/provider/Profile';
+import OrdersPage from '../pages/provider/Orders';
+import OrderDetailPage from '../pages/provider/Orders/[id]';
+
+// Admin imports
+import { AdminLayout } from '../layouts/AdminLayout';
+import { UserManagement } from '../pages/admin/UserManagement';
+import { AddUser } from '../pages/admin/AddUser';
+import { UserDetail } from '../pages/admin/UserDetail';
+import { LocationManagement } from '../pages/admin/LocationManagement';
+import { AddLocation } from '../pages/admin/AddLocation';
+import { LocationDetail } from '../pages/admin/LocationDetail';
+import { ReviewManagement } from '../pages/admin/ReviewManagement';
+import { ReviewDetail } from '../pages/admin/ReviewDetail';
+
+const AppRoutes: React.FC = () => {
+  return (
+    <Routes>
+      {/* Auth Routes */}
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
+
+      {/* Provider Routes */}
+      <Route path="/dashboard" element={<DashboardPage />} />
+      <Route path="/locations" element={<LocationsPage />} />
+      <Route path="/locations/:id" element={<LocationEditPage />} />
+      <Route path="/add-location" element={<AddLocationPage />} />
+      <Route path="/profile" element={<ProfilePage />} />
+      <Route path="/orders" element={<OrdersPage />} />
+      <Route path="/orders/:id" element={<OrderDetailPage />} />
+
+      {/* Admin Routes */}
+      <Route element={<AdminLayout><Outlet /></AdminLayout>}>
+        <Route path="/admin" element={<Navigate to="/admin/users" replace />} />
+        <Route path="/admin/users" element={<UserManagement />} />
+        <Route path="/admin/users/add" element={<AddUser />} />
+        <Route path="/admin/users/:id" element={<UserDetail />} />
+        <Route path="/admin/locations" element={<LocationManagement />} />
+        <Route path="/admin/locations/add" element={<AddLocation />} />
+        <Route path="/admin/locations/:id" element={<LocationDetail />} />
+        <Route path="/admin/reviews" element={<ReviewManagement />} />
+        <Route path="/admin/reviews/:id" element={<ReviewDetail />} />
+      </Route>
+
+      {/* Default Redirect */}
+      <Route path="/" element={<Navigate to="/login" replace />} />
+    </Routes>
+  );
+};
+
+export default AppRoutes;

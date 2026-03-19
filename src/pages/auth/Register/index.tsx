@@ -1,179 +1,145 @@
 import React, { useState } from 'react';
-import './Register.css';
-import { Mail, Lock, User, Phone } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import AuthLayout from '../../../layouts/AuthLayout/AuthLayout';
+import Input from '../../../components/UI/Input';
+import Button from '../../../components/UI/Button';
+import { User, Mail, Phone, Lock, ShieldCheck, Chrome, Facebook } from 'lucide-react';
+import loginBg from '../../../assets/login-bg.png';
 
-export const Register: React.FC = () => {
-  const navigate = useNavigate();
+const RegisterPage: React.FC = () => {
   const [formData, setFormData] = useState({
     fullName: '',
     phone: '',
     email: '',
     password: '',
     confirmPassword: '',
-    agreeToTerms: false
+    agree: false
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Register submitted:', formData);
-    
-    // Simulate successful registration and navigate to dashboard
-    navigate('/admin');
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
+    console.log('Register attempt:', formData);
+    // Registration logic would go here
   };
 
   return (
-    <div className="register-wrapper">
-      <div className="register-header">
-        <h2 className="register-title">Đăng ký đối tác mới</h2>
-        <p className="register-sub">
+    <AuthLayout bgImage={loginBg}>
+      <div style={{ marginBottom: '24px', textAlign: 'center' }}>
+        <h2 style={{ fontSize: '28px', fontWeight: '800', marginBottom: '8px', color: 'var(--text-primary)' }}>
+          Đăng ký đối tác mới
+        </h2>
+        <p style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>
           Vui lòng điền thông tin bên dưới để bắt đầu hợp tác.
         </p>
       </div>
 
-      <form className="register-form" onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label className="form-label">Họ và tên</label>
-          <div className="input-container">
-            <User className="input-icon" size={18} />
-            <input
-              type="text"
-              name="fullName"
-              placeholder="Nhập họ và tên"
-              className="form-input"
-              value={formData.fullName}
-              onChange={handleInputChange}
-              required
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column' }}>
+        <Input 
+          label="Họ và tên"
+          placeholder="Nhập họ và tên"
+          name="fullName"
+          value={formData.fullName}
+          onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+          icon={<User size={18} />}
+          style={{ marginBottom: '12px' }}
+        />
+
+        <Input 
+          label="Số điện thoại"
+          placeholder="Nhập số điện thoại"
+          name="phone"
+          value={formData.phone}
+          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+          icon={<Phone size={18} />}
+          style={{ marginBottom: '12px' }}
+        />
+
+        <Input 
+          label="Email"
+          placeholder="Nhập địa chỉ email"
+          type="email"
+          name="email"
+          value={formData.email}
+          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+          icon={<Mail size={18} />}
+          style={{ marginBottom: '12px' }}
+        />
+
+        <div style={{ display: 'flex', gap: '16px', marginBottom: '16px' }}>
+          <div style={{ flex: 1 }}>
+            <Input 
+              label="Mật khẩu"
+              placeholder="********"
+              type="password"
+              name="password"
+              value={formData.password}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              icon={<Lock size={18} />}
+              style={{ marginBottom: '0' }}
+            />
+          </div>
+          <div style={{ flex: 1 }}>
+            <Input 
+              label="Xác nhận"
+              placeholder="********"
+              type="password"
+              name="confirmPassword"
+              value={formData.confirmPassword}
+              onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+              icon={<ShieldCheck size={18} />}
+              style={{ marginBottom: '0' }}
             />
           </div>
         </div>
 
-        <div className="form-group">
-          <label className="form-label">Số điện thoại</label>
-          <div className="input-container">
-            <Phone className="input-icon" size={18} />
-            <input
-              type="tel"
-              name="phone"
-              placeholder="Nhập số điện thoại"
-              className="form-input"
-              value={formData.phone}
-              onChange={handleInputChange}
-              required
-            />
-          </div>
-        </div>
-
-        <div className="form-group">
-          <label className="form-label">Email</label>
-          <div className="input-container">
-            <Mail className="input-icon" size={18} />
-            <input
-              type="email"
-              name="email"
-              placeholder="Nhập địa chỉ email"
-              className="form-input"
-              value={formData.email}
-              onChange={handleInputChange}
-              required
-            />
-          </div>
-        </div>
-
-        <div className="form-row">
-          <div className="form-group">
-            <label className="form-label">Mật khẩu</label>
-            <div className="input-container">
-              <Lock className="input-icon" size={18} />
-              <input
-                type="password"
-                name="password"
-                placeholder="••••••••"
-                className="form-input"
-                value={formData.password}
-                onChange={handleInputChange}
-                required
-              />
-            </div>
-          </div>
-          <div className="form-group">
-            <label className="form-label">Xác nhận</label>
-            <div className="input-container">
-              <Lock className="input-icon" size={18} />
-              <input
-                type="password"
-                name="confirmPassword"
-                placeholder="••••••••"
-                className="form-input"
-                value={formData.confirmPassword}
-                onChange={handleInputChange}
-                required
-              />
-            </div>
-          </div>
-        </div>
-
-        <label className="terms-checkbox">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '20px' }}>
           <input 
             type="checkbox" 
-            name="agreeToTerms" 
-            checked={formData.agreeToTerms}
-            onChange={handleInputChange}
-            required
+            id="agree" 
+            checked={formData.agree}
+            onChange={(e) => setFormData({ ...formData, agree: e.target.checked })}
+            style={{ width: '16px', height: '16px', borderRadius: '4px' }}
           />
-          <span>
-            Tôi đồng ý với <Link to="/terms" className="terms-link">Điều khoản & Chính sách</Link> của Travel Partner.
-          </span>
-        </label>
+          <label htmlFor="agree" style={{ fontSize: '13px', color: 'var(--text-secondary)', userSelect: 'none' }}>
+            Tôi đồng ý với <a href="#" style={{ fontWeight: '600' }}>Điều khoản & Chính sách</a> của Travel Partner.
+          </label>
+        </div>
 
-        <button type="submit" className="btn-primary">
+        <Button type="submit" fullWidth style={{ padding: '14px', fontSize: '16px', marginBottom: '16px' }}>
           Đăng ký ngay
-        </button>
+        </Button>
+
+        <div style={{ position: 'relative', margin: '8px 0 16px', textAlign: 'center' }}>
+          <div style={{ position: 'absolute', top: '50%', left: 0, right: 0, height: '1px', background: 'var(--medium-gray)', zIndex: 0 }}></div>
+          <span style={{ position: 'relative', background: 'white', padding: '0 16px', fontSize: '12px', color: 'var(--text-secondary)', zIndex: 1, textTransform: 'uppercase', letterSpacing: '1px' }}>
+            HOẶC
+          </span>
+        </div>
+
+        <div style={{ display: 'flex', gap: '16px', marginBottom: '24px' }}>
+          <Button variant="secondary" fullWidth style={{ fontWeight: '600', fontSize: '14px' }}>
+            <Chrome size={18} fill="currentColor" />
+            Google
+          </Button>
+          <Button variant="secondary" fullWidth style={{ fontWeight: '600', fontSize: '14px' }}>
+            <Facebook size={18} fill="currentColor" />
+            Facebook
+          </Button>
+        </div>
+
+        <div style={{ textAlign: 'center', fontSize: '14px', color: 'var(--text-secondary)', marginBottom: '40px' }}>
+          Đã có tài khoản? <Link to="/login" style={{ fontWeight: '700', color: 'var(--secondary-blue)' }}>Đăng nhập</Link>
+        </div>
+
+        {/* Bottom footer links */}
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', fontSize: '12px', color: 'var(--text-secondary)', opacity: 0.7 }}>
+          <a href="#" style={{ color: 'inherit' }}>Trợ giúp</a>
+          <a href="#" style={{ color: 'inherit' }}>Quyền riêng tư</a>
+          <a href="#" style={{ color: 'inherit' }}>Liên hệ</a>
+        </div>
       </form>
-
-      <div className="divider"><span>HOẶC</span></div>
-
-      <div className="social-buttons">
-        <button className="btn-social">
-          <img 
-            src="https://www.svgrepo.com/show/475656/google-color.svg" 
-            alt="Google" 
-            width={20} 
-            height={20} 
-          />
-          Google
-        </button>
-        <button className="btn-social">
-          <img 
-            src="https://www.svgrepo.com/show/448225/facebook.svg" 
-            alt="Facebook" 
-            width={20} 
-            height={20} 
-          />
-          Facebook
-        </button>
-      </div>
-
-      <div className="footer-text">
-        Đã có tài khoản?{' '}
-        <Link to="/auth/login" className="login-link">
-          Đăng nhập
-        </Link>
-      </div>
-
-      <div className="register-footer-links">
-        <a href="#">Trợ giúp</a>
-        <a href="#">Quyền riêng tư</a>
-        <a href="#">Liên hệ</a>
-      </div>
-    </div>
+    </AuthLayout>
   );
 };
+
+export default RegisterPage;

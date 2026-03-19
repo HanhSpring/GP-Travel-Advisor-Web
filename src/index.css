@@ -1,20 +1,31 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
 
 :root {
+  font-family: 'Plus Jakarta Sans', 'Outfit', sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
   /* Colors */
   --bg-main: #f8fafc;
   --bg-surface: #ffffff;
-  --text-primary: #0f172a;
-  --text-secondary: #64748b;
-  --text-muted: #94a3b8;
-  --border-color: #e2e8f0;
-
   --primary-blue: #3b82f6;
   --primary-blue-hover: #2563eb;
-  
+  --secondary-blue: #2563eb;
+  --dark-blue: #1e3a8a;
+  --light-gray: #f9fafb;
+  --medium-gray: #e5e7eb;
+  --dark-gray: #4b5563;
+  --border-color: #d1d5db;
+  --text-primary: #111827;
+  --text-secondary: #6b7280;
+  --text-muted: #94a3b8;
+
   --success-green: #10b981;
   --danger-red: #ef4444;
   --warning-orange: #f59e0b;
+
+  color: var(--text-primary);
+  background-color: #ffffff;
 
   /* Tag Colors */
   --role-admin-bg: #ffe4e6;
@@ -85,20 +96,44 @@
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   background-color: var(--bg-main);
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
+  margin: 0;
+  display: flex;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+#root {
+  width: 100%;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700;
+}
+
+p {
+  margin: 0;
 }
 
 a {
   text-decoration: none;
-  color: inherit;
+  color: var(--primary-blue);
+  transition: color 0.2s;
+}
+
+a:hover {
+  color: var(--secondary-blue);
 }
 
 button {
   cursor: pointer;
   border: none;
+  outline: none;
   background: none;
   font-family: inherit;
 }
@@ -108,12 +143,20 @@ input, select {
   outline: none;
 }
 
+/* Utilities */
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+.w-full { width: 100%; }
+.h-full { height: 100%; }
+.min-h-screen { min-height: 100vh; }
+.m-0 { margin: 0; }
+.p-0 { padding: 0; }
+
 /* ══════════════════════════════════════════
    GLOBAL RESPONSIVE TABLE → CARD (Mobile)
-   ══════════════════════════════════════════
-   Technique: each <tr> becomes a card, each
-   <td> becomes a flex row with data-label::before
-   as the column heading. No content is hidden.
    ══════════════════════════════════════════ */
 
 @media (max-width: 768px) {
@@ -168,8 +211,6 @@ input, select {
 
   /* ════════════════════════════════════════
      TABLE → CARD LAYOUT
-     Applied to user-table, location-table,
-     and rv-table simultaneously
      ════════════════════════════════════════ */
 
   .user-table,
@@ -273,4 +314,3 @@ input, select {
     gap: 6px;
   }
 }
-

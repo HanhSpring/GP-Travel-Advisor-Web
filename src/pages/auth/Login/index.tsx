@@ -1,132 +1,112 @@
 import React, { useState } from 'react';
-import './Login.css';
-import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import AuthLayout from '../../../layouts/AuthLayout/AuthLayout';
+import Input from '../../../components/UI/Input';
+import Button from '../../../components/UI/Button';
+import { Mail, Lock, Eye, EyeOff, Chrome, Linkedin } from 'lucide-react';
+import loginBg from '../../../assets/login-bg.png';
 
-export const Login: React.FC = () => {
+const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
-    rememberMe: false
+    remember: false
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Login submitted:', formData);
-    
-    // Simulate successful login and navigate to dashboard
-    navigate('/admin');
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
+    console.log('Login attempt:', formData);
+    // Authentication logic would go here
+    // Redirect to dashboard on success
+    navigate('/dashboard');
   };
 
   return (
-    <div className="login-wrapper">
-      <div className="login-header">
-        <h2 className="login-title">Đăng nhập</h2>
-        <p className="login-sub">
-          Chào mừng trở lại! Vui lòng nhập thông tin để truy cập hệ thống quản lý.
+    <AuthLayout bgImage={loginBg}>
+      <div style={{ marginBottom: '32px' }}>
+        <h2 style={{ fontSize: '32px', fontWeight: '800', marginBottom: '12px', color: 'var(--text-primary)' }}>
+          Đăng nhập
+        </h2>
+        <p style={{ color: 'var(--text-secondary)', fontSize: '15px', lineHeight: '1.6' }}>
+          Chào mừng trở lại! Vui lòng nhập thông tin để truy cập hệ thống quản trị.
         </p>
       </div>
 
-      <form className="login-form" onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label className="form-label" htmlFor="email">Email hoặc Số điện thoại</label>
-          <div className="input-container">
-            <Mail className="input-icon" size={20} />
-            <input
-              type="text"
-              id="email"
-              name="email"
-              placeholder="example@travel.com"
-              className="form-input"
-              value={formData.email}
-              onChange={handleInputChange}
-              required
-            />
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column' }}>
+        <Input 
+          label="Email hoặc Số điện thoại"
+          placeholder="example@travel.com"
+          type="text"
+          name="email"
+          value={formData.email}
+          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+          icon={<Mail size={18} />}
+        />
+
+        <div style={{ marginBottom: '8px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+            <label style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text-primary)' }}>Mật khẩu</label>
+            <a href="#" style={{ fontSize: '14px', fontWeight: '600', color: 'var(--secondary-blue)' }}>Quên mật khẩu?</a>
           </div>
+          <Input 
+            placeholder="********"
+            type={showPassword ? 'text' : 'password'}
+            name="password"
+            value={formData.password}
+            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+            icon={<Lock size={18} />}
+            rightIcon={
+              <div onClick={() => setShowPassword(!showPassword)}>
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </div>
+            }
+            style={{ marginBottom: '0' }}
+          />
         </div>
 
-        <div className="form-group">
-          <label className="form-label" htmlFor="password">Mật khẩu</label>
-          <div className="input-container">
-            <Lock className="input-icon" size={20} />
-            <input
-              type={showPassword ? 'text' : 'password'}
-              id="password"
-              name="password"
-              placeholder="••••••••"
-              className="form-input"
-              value={formData.password}
-              onChange={handleInputChange}
-              required
-            />
-            <div 
-              className="input-eye" 
-              onClick={() => setShowPassword(!showPassword)}
-            >
-              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-            </div>
-          </div>
-        </div>
-
-        <div className="form-options">
-          <label className="remember-me">
-            <input 
-              type="checkbox" 
-              name="rememberMe" 
-              checked={formData.rememberMe}
-              onChange={handleInputChange}
-            />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px', cursor: 'pointer' }}>
+          <input 
+            type="checkbox" 
+            id="remember" 
+            checked={formData.remember}
+            onChange={(e) => setFormData({ ...formData, remember: e.target.checked })}
+            style={{ width: '16px', height: '16px', borderRadius: '4px' }}
+          />
+          <label htmlFor="remember" style={{ fontSize: '14px', color: 'var(--text-secondary)', userSelect: 'none' }}>
             Ghi nhớ đăng nhập
           </label>
-          <Link to="/auth/forgot-password" className="forgot-password">
-            Quên mật khẩu?
-          </Link>
         </div>
 
-        <button type="submit" className="btn-primary">
+        <Button type="submit" fullWidth style={{ padding: '14px', fontSize: '16px', marginBottom: '32px' }}>
           Đăng nhập ngay
-        </button>
+        </Button>
+
+        <div style={{ position: 'relative', marginBottom: '32px', textAlign: 'center' }}>
+          <div style={{ position: 'absolute', top: '50%', left: 0, right: 0, height: '1px', background: 'var(--medium-gray)', zIndex: 0 }}></div>
+          <span style={{ position: 'relative', background: 'white', padding: '0 16px', fontSize: '13px', color: 'var(--text-secondary)', zIndex: 1 }}>
+            Hoặc tiếp tục với
+          </span>
+        </div>
+
+        <div style={{ display: 'flex', gap: '16px', marginBottom: '40px' }}>
+          <Button variant="secondary" fullWidth style={{ fontWeight: '600' }}>
+            <Chrome size={18} fill="currentColor" />
+            Google
+          </Button>
+          <Button variant="secondary" fullWidth style={{ fontWeight: '600' }}>
+            <Linkedin size={18} fill="currentColor" />
+            LinkedIn
+          </Button>
+        </div>
+
+        <div style={{ textAlign: 'center', fontSize: '14px', color: 'var(--text-secondary)' }}>
+          Chưa có tài khoản dành cho đối tác? <Link to="/register" style={{ fontWeight: '700', color: 'var(--secondary-blue)' }}>Đăng ký tài khoản mới</Link>
+        </div>
       </form>
-
-      <div className="divider"><span>Hoặc tiếp tục với</span></div>
-
-      <div className="social-buttons">
-        <button className="btn-social">
-          <img 
-            src="https://www.svgrepo.com/show/475656/google-color.svg" 
-            alt="Google" 
-            width={20} 
-            height={20} 
-          />
-          Google
-        </button>
-        <button className="btn-social">
-          <img 
-            src="https://www.svgrepo.com/show/448234/linkedin.svg" 
-            alt="LinkedIn" 
-            width={20} 
-            height={20} 
-          />
-          LinkedIn
-        </button>
-      </div>
-
-      <div className="footer-text">
-        Chưa có tài khoản dành cho đối tác?{' '}
-        <Link to="/auth/register" className="register-link">
-          Đăng ký tài khoản mới
-        </Link>
-      </div>
-    </div>
+    </AuthLayout>
   );
 };
+
+export default LoginPage;
