@@ -1,0 +1,32 @@
+import React from 'react';
+import { Bell } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+
+export const DetailHeader: React.FC = () => {
+  const navigate = useNavigate();
+
+  return (
+    <div className="detail-header-container">
+      <div className="breadcrumb">
+        <span 
+          className="breadcrumb-link" 
+          onClick={() => navigate('/admin/users')}
+        >
+          Quản lý người dùng
+        </span>
+        <span className="separator">&gt;</span>
+        <span className="current">Chi tiết người dùng</span>
+      </div>
+      
+      <div className="header-actions">
+        <button className="icon-btn">
+          <Bell size={20} />
+        </button>
+        <div className="user-avatar-small bg-blue-primary">
+          <span className="avatar-text">AD</span>
+        </div>
+        <span className="header-username">Nguyen Admin</span>
+      </div>
+    </div>
+  );
+};

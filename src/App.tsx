@@ -1,43 +1,28 @@
-import { useState } from 'react'
-import './App.css'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { AdminLayout } from './layouts/AdminLayout';
+import { UserManagement } from './pages/admin/UserManagement';
+import { UserDetail } from './pages/admin/UserDetail';
+import { LocationManagement } from './pages/admin/LocationManagement';
+import { LocationDetail } from './pages/admin/LocationDetail';
+import { ReviewManagement } from './pages/admin/ReviewManagement';
+import { ReviewDetail } from './pages/admin/ReviewDetail';
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <div className="app">
-      <header className="app-header">
-        <h1>🌍 Travel Advisor</h1>
-        <p>Admin & Local Service Provider Portal</p>
-      </header>
-      
-      <main className="app-main">
-        <div className="card">
-          <h2>Welcome to Travel Advisor Web</h2>
-          <p>This is the admin and provider management portal.</p>
-          
-          <button onClick={() => setCount((count) => count + 1)}>
-            Count is {count}
-          </button>
-          
-          <div className="modules">
-            <div className="module-card">
-              <h3>👤 Admin Module</h3>
-              <p>Manage users, destinations, and system settings</p>
-            </div>
-            <div className="module-card">
-              <h3>🏨 Provider Module</h3>
-              <p>Manage local services and bookings</p>
-            </div>
-          </div>
-        </div>
-      </main>
-      
-      <footer className="app-footer">
-        <p>Built with React + TypeScript + Vite</p>
-      </footer>
-    </div>
-  )
+    <BrowserRouter>
+      <AdminLayout>
+        <Routes>
+          <Route path="/" element={<Navigate to="/admin/users" replace />} />
+          <Route path="/admin/users" element={<UserManagement />} />
+          <Route path="/admin/users/:id" element={<UserDetail />} />
+          <Route path="/admin/locations" element={<LocationManagement />} />
+          <Route path="/admin/locations/:id" element={<LocationDetail />} />
+          <Route path="/admin/reviews" element={<ReviewManagement />} />
+          <Route path="/admin/reviews/:id" element={<ReviewDetail />} />
+        </Routes>
+      </AdminLayout>
+    </BrowserRouter>
+  );
 }
 
-export default App
+export default App;

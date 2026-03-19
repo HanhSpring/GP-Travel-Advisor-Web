@@ -1,68 +1,242 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+  /* Colors */
+  --bg-main: #f8fafc;
+  --bg-surface: #ffffff;
+  --text-primary: #0f172a;
+  --text-secondary: #64748b;
+  --text-muted: #94a3b8;
+  --border-color: #e2e8f0;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  --primary-blue: #3b82f6;
+  --primary-blue-hover: #2563eb;
+  
+  --success-green: #10b981;
+  --danger-red: #ef4444;
+  --warning-orange: #f59e0b;
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  /* Tag Colors */
+  --role-admin-bg: #ffe4e6;
+  --role-admin-text: #e11d48;
+  
+  --role-provider-bg: #e0f2fe;
+  --role-provider-text: #0284c7;
+
+  --role-tourist-bg: #f1f5f9;
+  --role-tourist-text: #475569;
+
+  --status-active-bg: #dcfce7;
+  --status-active-text: #15803d;
+
+  --status-locked-bg: #fee2e2;
+  --status-locked-text: #b91c1c;
+
+  /* Layout */
+  --sidebar-width: 250px;
+  --header-height: 80px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --border-radius-sm: 6px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--bg-main);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+a {
+  text-decoration: none;
+  color: inherit;
 }
 
 button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
   cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  border: none;
+  background: none;
+  font-family: inherit;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
+input, select {
+  font-family: inherit;
+  outline: none;
+}
+
+/* ══════════════════════════════════════════
+   GLOBAL RESPONSIVE TABLE → CARD (Mobile)
+   ══════════════════════════════════════════
+   Technique: each <tr> becomes a card, each
+   <td> becomes a flex row with data-label::before
+   as the column heading. No content is hidden.
+   ══════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+  /* ── General page padding ── */
+  .page-container {
+    padding: 12px !important;
   }
-  a:hover {
-    color: #747bff;
+
+  /* ── Stats grids: single column ── */
+  .user-stats,
+  .stats-grid {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
   }
-  button {
-    background-color: #f9f9f9;
+
+  /* ── Filter bars: stack vertically ── */
+  .table-filter-bar,
+  .location-filter-bar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+  }
+
+  .filter-actions,
+  .filter-left,
+  .filter-right {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .search-box {
+    width: 100% !important;
+  }
+
+  /* ── Page header: stack ── */
+  .page-header {
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+
+  .header-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  /* ── Pagination: center ── */
+  .pagination-wrapper {
+    flex-direction: column !important;
+    gap: 10px !important;
+    align-items: center !important;
+  }
+
+  /* ════════════════════════════════════════
+     TABLE → CARD LAYOUT
+     Applied to user-table, location-table,
+     and rv-table simultaneously
+     ════════════════════════════════════════ */
+
+  .user-table,
+  .location-table,
+  .rv-table {
+    display: block;
+    width: 100%;
+  }
+
+  /* Hide the <thead> */
+  .user-table thead,
+  .location-table thead,
+  .rv-table thead {
+    display: none;
+  }
+
+  /* <tbody>: block flow */
+  .user-table tbody,
+  .location-table tbody,
+  .rv-table tbody {
+    display: block;
+    width: 100%;
+  }
+
+  /* Each <tr> becomes a card */
+  .user-table tbody tr,
+  .location-table tbody tr,
+  .rv-table tbody tr {
+    display: block;
+    margin-bottom: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    background-color: var(--bg-surface);
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  }
+
+  /* Each <td> becomes a flex row: label | value */
+  .user-table tbody td,
+  .location-table tbody td,
+  .rv-table tbody td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 0.875rem;
+    min-height: 44px;
+    text-align: right;
+  }
+
+  /* Remove bottom border from last cell */
+  .user-table tbody td:last-child,
+  .location-table tbody td:last-child,
+  .rv-table tbody td:last-child {
+    border-bottom: none;
+  }
+
+  /* The label from data-label */
+  .user-table tbody td::before,
+  .location-table tbody td::before,
+  .rv-table tbody td::before {
+    content: attr(data-label);
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    margin-right: 12px;
+    flex-shrink: 0;
+    text-align: left;
+  }
+
+  /* Checkbox cell: centered, no label */
+  .td-checkbox {
+    justify-content: center !important;
+    padding: 10px 14px !important;
+    border-bottom: 1px solid var(--border-color) !important;
+  }
+
+  .td-checkbox::before {
+    display: none !important;
+  }
+
+  /* User/author profile: left-aligned within value */
+  .user-profile,
+  .rv-user-cell,
+  .author-profile,
+  .action-buttons {
+    justify-content: flex-end;
+  }
+
+  /* Location info: right-align text */
+  .location-info {
+    text-align: right;
+  }
+
+  /* Action buttons: smaller gap on mobile */
+  .action-buttons {
+    gap: 6px;
   }
 }
+
