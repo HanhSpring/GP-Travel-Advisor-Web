@@ -1,7 +1,7 @@
 import React from 'react';
 import ProviderLayout from '../../../../layouts/ProviderLayout/ProviderLayout';
 import Button from '../../../../components/UI/Button';
-import { Mail, MapPin, CheckCircle, XCircle, Printer } from 'lucide-react';
+import { Mail, Phone, User, CheckCircle, XCircle, Clock, Printer } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { mockOrders } from '../../../../mocks/orders';
 
@@ -30,27 +30,70 @@ const OrderDetailPage: React.FC = () => {
             {orderData.statusText}
           </div>
         </div>
+ 
+        {/* Time Info Horizontal Bar */}
+        <div style={{ display: 'flex', gap: '24px', marginBottom: '32px' }}>
+           <div style={{ flex: 1, background: 'white', borderRadius: '24px', padding: '20px 24px', border: '1px solid #F1F5F9', display: 'flex', alignItems: 'center', gap: '16px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
+              <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: '#F0FDF4', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#16a34a' }}>
+                 <Clock size={20} />
+              </div>
+              <div>
+                 <p style={{ fontSize: '11px', color: '#94a3b8', fontWeight: '800', textTransform: 'uppercase', marginBottom: '4px', letterSpacing: '0.5px' }}>Thời gian khách đặt</p>
+                 <p style={{ fontSize: '16px', fontWeight: '800', color: '#1e293b' }}>{orderData.timeInfo.ordered}</p>
+              </div>
+           </div>
+           <div style={{ flex: 1, background: 'white', borderRadius: '24px', padding: '20px 24px', border: '1px solid #F1F5F9', display: 'flex', alignItems: 'center', gap: '16px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
+              <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: '#EFF6FF', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#3b82f6' }}>
+                 <Clock size={20} />
+              </div>
+              <div>
+                 <p style={{ fontSize: '11px', color: '#94a3b8', fontWeight: '800', textTransform: 'uppercase', marginBottom: '4px', letterSpacing: '0.5px' }}>Dự kiến khách sẽ đến</p>
+                 <p style={{ fontSize: '16px', fontWeight: '800', color: '#1e293b' }}>{orderData.timeInfo.expected}</p>
+              </div>
+           </div>
+        </div>
 
         <div style={{ display: 'flex', gap: '32px' }}>
           {/* Left: Customer Info */}
           <div style={{ width: '320px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            <div style={{ background: 'white', borderRadius: '24px', padding: '32px', border: '1px solid #F1F5F9', textAlign: 'center' }}>
-              <h5 style={{ fontSize: '12px', fontWeight: '800', color: '#94a3b8', textTransform: 'uppercase', textAlign: 'left', marginBottom: '24px' }}>Thông tin khách hàng</h5>
-              <div style={{ width: '100px', height: '100px', borderRadius: '50%', overflow: 'hidden', margin: '0 auto 20px', border: '4px solid #F8FAFC' }}>
-                <img src={orderData.customer.avatar} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-              </div>
-              <h4 style={{ fontSize: '18px', fontWeight: '800', color: '#1e293b', marginBottom: '4px' }}>{orderData.customer.name}</h4>
-              <p style={{ fontSize: '13px', color: '#64748b', marginBottom: '12px' }}>Số điện thoại: {orderData.customer.phone}</p>
-              <span style={{ display: 'inline-block', padding: '6px 16px', background: '#EFF6FF', color: '#3b82f6', borderRadius: '20px', fontSize: '11px', fontWeight: '800', marginBottom: '32px' }}>{orderData.customer.label}</span>
-              
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', textAlign: 'left', borderTop: '1px solid #F1F5F9', paddingTop: '24px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: '#64748b', fontSize: '14px' }}>
-                  <Mail size={16} /> {orderData.customer.email}
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: '#64748b', fontSize: '14px' }}>
-                  <MapPin size={16} /> {orderData.customer.location}
-                </div>
-              </div>
+            <div style={{ 
+              background: 'white', 
+              borderRadius: '24px', 
+              padding: '24px', 
+              border: '1px solid #F1F5F9',
+              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)'
+            }}>
+               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
+                  <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: '#F0F9FF', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#3b82f6' }}>
+                     <User size={20} />
+                  </div>
+                  <h5 style={{ fontSize: '12px', fontWeight: '800', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Thông tin khách hàng</h5>
+               </div>
+
+               <div style={{ padding: '20px', background: '#F8FAFC', borderRadius: '20px', marginBottom: '24px' }}>
+                  <h4 style={{ fontSize: '20px', fontWeight: '800', color: '#1e293b' }}>{orderData.customer.name}</h4>
+               </div>
+
+               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <div style={{ padding: '16px', borderRadius: '16px', border: '1px solid #F1F5F9', display: 'flex', alignItems: 'center', gap: '14px', transition: '0.2s' }}>
+                     <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'white', border: '1px solid #F1F5F9', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748b' }}>
+                        <Phone size={16} />
+                     </div>
+                     <div>
+                        <p style={{ fontSize: '11px', color: '#94a3b8', fontWeight: '800', textTransform: 'uppercase', marginBottom: '2px' }}>Số điện thoại</p>
+                        <p style={{ fontSize: '14px', fontWeight: '700', color: '#1e293b' }}>{orderData.customer.phone}</p>
+                     </div>
+                  </div>
+                  <div style={{ padding: '16px', borderRadius: '16px', border: '1px solid #F1F5F9', display: 'flex', alignItems: 'center', gap: '14px' }}>
+                     <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'white', border: '1px solid #F1F5F9', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748b' }}>
+                        <Mail size={16} />
+                     </div>
+                     <div>
+                        <p style={{ fontSize: '11px', color: '#94a3b8', fontWeight: '800', textTransform: 'uppercase', marginBottom: '2px' }}>Địa chỉ Email</p>
+                        <p style={{ fontSize: '14px', fontWeight: '700', color: '#1e293b', maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis' }}>{orderData.customer.email}</p>
+                     </div>
+                  </div>
+               </div>
             </div>
           </div>
 
@@ -99,32 +142,37 @@ const OrderDetailPage: React.FC = () => {
             {/* Actions */}
             <div style={{ background: 'white', borderRadius: '24px', padding: '24px', border: '1px solid #F1F5F9', display: 'flex', flexDirection: 'column', gap: '12px' }}>
                <h5 style={{ fontSize: '12px', fontWeight: '800', color: '#94a3b8', textTransform: 'uppercase', marginBottom: '4px' }}>Thao tác đơn hàng</h5>
-               <Button fullWidth style={{ borderRadius: '12px', gap: '8px', padding: '14px' }}>
-                 <CheckCircle size={18} /> Xác nhận đơn
-               </Button>
-               <Button variant="outline" fullWidth style={{ borderRadius: '12px', gap: '8px', padding: '14px', color: '#ef4444', borderColor: '#FEE2E2', background: 'transparent' }}>
-                 <XCircle size={18} /> Hủy đơn
-               </Button>
-               <Button variant="ghost" fullWidth style={{ borderRadius: '12px', gap: '8px', padding: '14px', background: '#F1F5F9', color: '#1e293b' }}>
-                 <Printer size={18} /> In hóa đơn
-               </Button>
+               
+               {orderData.status === 'confirm' && (
+                  <>
+                    <Button fullWidth style={{ borderRadius: '12px', gap: '8px', padding: '14px' }}>
+                      <CheckCircle size={18} /> Xác nhận đơn
+                    </Button>
+                    <Button variant="outline" fullWidth style={{ borderRadius: '12px', gap: '8px', padding: '14px', color: '#ef4444', borderColor: '#FEE2E2', background: 'transparent' }}>
+                      <XCircle size={18} /> Hủy đơn
+                    </Button>
+                  </>
+               )}
+
+               {orderData.status === 'cooking' && (
+                  <>
+                    <Button fullWidth style={{ borderRadius: '12px', gap: '8px', padding: '14px', background: '#10b981' }}>
+                      <CheckCircle size={18} /> Hoàn thành
+                    </Button>
+                    <Button variant="outline" fullWidth style={{ borderRadius: '12px', gap: '8px', padding: '14px', color: '#ef4444', borderColor: '#FEE2E2', background: 'transparent' }}>
+                      <XCircle size={18} /> Hủy đơn
+                    </Button>
+                  </>
+               )}
+
+               {orderData.status === 'completed' && (
+                  <Button variant="ghost" fullWidth style={{ borderRadius: '12px', gap: '8px', padding: '14px', background: '#F1F5F9', color: '#1e293b' }}>
+                    <Printer size={18} /> In hóa đơn
+                  </Button>
+               )}
+
             </div>
 
-            {/* Time Info */}
-            <div style={{ background: 'white', borderRadius: '24px', padding: '24px', border: '1px solid #F1F5F9', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-               <h5 style={{ fontSize: '12px', fontWeight: '800', color: '#94a3b8', textTransform: 'uppercase' }}>Thời gian</h5>
-               <div style={{ position: 'relative', paddingLeft: '24px' }}>
-                  <div style={{ position: 'absolute', left: '2px', top: '5px', width: '8px', height: '8px', borderRadius: '50%', background: '#22c55e' }}></div>
-                  <div style={{ position: 'absolute', left: '5px', top: '13px', width: '2px', height: '24px', background: '#F1F5F9' }}></div>
-                  <p style={{ fontSize: '12px', color: '#94a3b8', marginBottom: '4px' }}>Đã đặt lúc:</p>
-                  <p style={{ fontSize: '13px', fontWeight: '700', color: '#1e293b' }}>{orderData.timeInfo.ordered}</p>
-               </div>
-               <div style={{ position: 'relative', paddingLeft: '24px' }}>
-                  <div style={{ position: 'absolute', left: '2px', top: '5px', width: '8px', height: '8px', borderRadius: '50%', background: '#3b82f6' }}></div>
-                  <p style={{ fontSize: '12px', color: '#94a3b8', marginBottom: '4px' }}>Dự kiến thời gian khách hàng đến:</p>
-                  <p style={{ fontSize: '13px', fontWeight: '700', color: '#1e293b' }}>{orderData.timeInfo.expected}</p>
-               </div>
-            </div>
           </div>
         </div>
       </div>

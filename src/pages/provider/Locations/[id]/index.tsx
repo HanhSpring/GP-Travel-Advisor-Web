@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import ProviderLayout from '../../../../layouts/ProviderLayout/ProviderLayout';
 import Input from '../../../../components/UI/Input';
 import Button from '../../../../components/UI/Button';
-import { Clock, MapPin, Upload, Wifi, Car, Wind, CreditCard, Search, Plus, Trash2, Edit2, ChevronLeft, ChevronRight, Star, Sparkles, Waves } from 'lucide-react';
+import { Clock, MapPin, Upload, Wifi, Car, Wind, CreditCard, Search, Plus, Trash2, Edit2, ChevronLeft, ChevronRight, Star, Waves } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { mockLocations } from '../../../../mocks/locations';
 
@@ -11,6 +11,7 @@ const LocationEditPage: React.FC = () => {
   const { id } = useParams();
   const [activeTab, setActiveTab] = useState('Thông tin chung');
   const [isActive, setIsActive] = useState(true);
+  const [replyingToId, setReplyingToId] = useState<string | null>(null);
 
   // Get location data from mock
   const loc = mockLocations.find(l => l.id === id) || mockLocations[0];
@@ -126,7 +127,6 @@ const LocationEditPage: React.FC = () => {
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
                   <label style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text-primary)' }}>Hình ảnh địa điểm ({locationData.gallery.length})</label>
-                  <button style={{ color: '#3b82f6', fontSize: '13px', fontWeight: '700', border: 'none', background: 'transparent', cursor: 'pointer' }}>+ Thêm ảnh</button>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>
                    {locationData.gallery.map((img, i) => (
@@ -153,7 +153,7 @@ const LocationEditPage: React.FC = () => {
   const renderServiceSection = (title: string, showSearch = true) => (
     <div style={{ marginBottom: '48px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-            <h5 style={{ fontSize: '16px', fontWeight: '800', color: '#1e293b' }}>{title}</h5>
+            <h5 style={{ fontSize: '18px', fontWeight: '800', color: '#000000', fontFamily: "'Times New Roman', Times, serif" }}>{title}</h5>
             <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
                 {showSearch && (
                     <div style={{ position: 'relative', width: '280px' }}>
@@ -183,12 +183,12 @@ const LocationEditPage: React.FC = () => {
                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                     <thead>
                         <tr style={{ textAlign: 'left', background: '#FCFCFD', borderBottom: '1px solid #F1F5F9' }}>
-                           <th style={{ padding: '16px 24px', fontSize: '11px', fontWeight: '800', color: '#94a3b8', textTransform: 'uppercase' }}>Hình ảnh</th>
-                           <th style={{ padding: '16px 24px', fontSize: '11px', fontWeight: '800', color: '#94a3b8', textTransform: 'uppercase' }}>Tên món</th>
-                           <th style={{ padding: '16px 24px', fontSize: '11px', fontWeight: '800', color: '#94a3b8', textTransform: 'uppercase' }}>Phân loại</th>
-                           <th style={{ padding: '16px 24px', fontSize: '11px', fontWeight: '800', color: '#94a3b8', textTransform: 'uppercase' }}>Giá bán</th>
-                           <th style={{ padding: '16px 24px', fontSize: '11px', fontWeight: '800', color: '#94a3b8', textTransform: 'uppercase' }}>Trạng thái</th>
-                           <th style={{ padding: '16px 24px', fontSize: '11px', fontWeight: '800', color: '#94a3b8', textTransform: 'uppercase' }}>Thao tác</th>
+                           <th style={{ padding: '16px 24px', fontSize: '15px', fontWeight: '800', color: '#000000', fontFamily: "'Times New Roman', Times, serif" }}>Hình ảnh</th>
+                           <th style={{ padding: '16px 24px', fontSize: '15px', fontWeight: '800', color: '#000000', fontFamily: "'Times New Roman', Times, serif" }}>Tên món</th>
+                           <th style={{ padding: '16px 24px', fontSize: '15px', fontWeight: '800', color: '#000000', fontFamily: "'Times New Roman', Times, serif" }}>Phân loại</th>
+                           <th style={{ padding: '16px 24px', fontSize: '15px', fontWeight: '800', color: '#000000', fontFamily: "'Times New Roman', Times, serif" }}>Giá bán</th>
+                           <th style={{ padding: '16px 24px', fontSize: '15px', fontWeight: '800', color: '#000000', fontFamily: "'Times New Roman', Times, serif" }}>Trạng thái</th>
+                           <th style={{ padding: '16px 24px', fontSize: '15px', fontWeight: '800', color: '#000000', fontFamily: "'Times New Roman', Times, serif" }}>Thao tác</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -237,12 +237,89 @@ const LocationEditPage: React.FC = () => {
   );
 
   const renderServicesMenu = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '40px' }}>
-       <h4 style={{ fontSize: '18px', fontWeight: '800', color: '#1e293b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Dịch vụ</h4>
-       
-       {renderServiceSection('Dịch vụ tiện ích')}
-       {renderServiceSection('Bảng giá')}
-       {renderServiceSection('Quản lý thực đơn món ăn')}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
+       {/* TIỆN ÍCH MIỄN PHÍ */}
+       <div>
+           <h5 style={{ fontSize: '18px', fontWeight: '800', color: '#000000', fontFamily: "'Times New Roman', Times, serif", marginBottom: '24px' }}>Tiện ích miễn phí</h5>
+           <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+              {locationData.services.map(s => (
+                  <div key={s.id} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 24px', background: '#F8FAFC', border: '1px solid #F1F5F9', color: '#475569', borderRadius: '20px', fontSize: '14px', fontWeight: '600' }}>
+                      <span style={{ color: '#94a3b8' }}>{s.icon}</span> <span>{s.name}</span>
+                  </div>
+              ))}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 24px', border: '1px solid #E2E8F0', borderStyle: 'dashed', color: '#94a3b8', borderRadius: '20px', fontSize: '14px', fontWeight: '600', cursor: 'pointer', background: 'transparent' }}>
+                 <Plus size={16} /> <span>Thêm tiện ích</span>
+              </div>
+           </div>
+       </div>
+
+       {/* DỊCH VỤ TÍNH PHÍ */}
+       <div>
+           <h5 style={{ fontSize: '18px', fontWeight: '800', color: '#000000', fontFamily: "'Times New Roman', Times, serif", marginBottom: '24px' }}>Dịch vụ tính phí</h5>
+           <div style={{ background: 'white', border: '1px solid #F1F5F9', borderRadius: '24px', overflow: 'hidden', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                 <thead>
+                    <tr style={{ textAlign: 'left', background: '#FCFCFD', borderBottom: '1px solid #F1F5F9' }}>
+                       <th style={{ padding: '20px 32px', fontSize: '15px', fontWeight: '800', color: '#000000', fontFamily: "'Times New Roman', Times, serif" }}>Tên dịch vụ</th>
+                       <th style={{ padding: '20px 32px', fontSize: '15px', fontWeight: '800', color: '#000000', fontFamily: "'Times New Roman', Times, serif" }}>Phân loại</th>
+                       <th style={{ padding: '20px 32px', fontSize: '15px', fontWeight: '800', color: '#000000', fontFamily: "'Times New Roman', Times, serif", textAlign: 'center' }}>Giá dịch vụ</th>
+                       <th style={{ padding: '20px 32px', fontSize: '15px', fontWeight: '800', color: '#000000', fontFamily: "'Times New Roman', Times, serif", textAlign: 'center' }}>Trạng thái</th>
+                       <th style={{ padding: '20px 32px', fontSize: '15px', fontWeight: '800', color: '#000000', fontFamily: "'Times New Roman', Times, serif", textAlign: 'center' }}>Thao tác</th>
+                    </tr>
+                 </thead>
+                 <tbody>
+                    {[
+                      { id: 1, name: 'Phòng VIP riêng tư', category: 'Dịch vụ phòng', price: '200.000 đ', active: true },
+                      { id: 2, name: 'Trang trí tiệc sinh nhật', category: 'Sự kiện', price: '500.000 đ', active: true },
+                      { id: 3, name: 'Karaoke tại phòng', category: 'Giải trí', price: '150.000 đ', active: false },
+                    ].map((item, idx, arr) => (
+                       <tr key={item.id} style={{ borderBottom: idx < arr.length - 1 ? '1px solid #F8FAFC' : 'none' }}>
+                          <td style={{ padding: '24px 32px', fontSize: '14px', fontWeight: '700', color: '#1e293b' }}>{item.name}</td>
+                          <td style={{ padding: '24px 32px' }}>
+                             <span style={{ padding: '6px 14px', borderRadius: '8px', background: '#EFF6FF', color: '#3b82f6', fontSize: '12px', fontWeight: '700' }}>{item.category}</span>
+                          </td>
+                          <td style={{ padding: '24px 32px', fontSize: '15px', fontWeight: '800', color: '#3b82f6', textAlign: 'center', textDecoration: 'underline' }}>{item.price}</td>
+                          <td style={{ padding: '24px 32px', textAlign: 'center' }}>
+                             <div style={{ 
+                                width: '44px', 
+                                height: '24px', 
+                                background: item.active ? '#3b82f6' : '#E2E8F0', 
+                                borderRadius: '20px', 
+                                position: 'relative', 
+                                cursor: 'pointer',
+                                display: 'inline-block',
+                                verticalAlign: 'middle',
+                                transition: '0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+                             }}>
+                                <div style={{ 
+                                   position: 'absolute', 
+                                   right: item.active ? '4px' : 'auto', 
+                                   left: item.active ? 'auto' : '4px',
+                                   top: '4px', 
+                                   width: '16px', 
+                                   height: '16px', 
+                                   background: 'white', 
+                                   borderRadius: '50%',
+                                   transition: '0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                   boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+                                }}></div>
+                             </div>
+                          </td>
+                          <td style={{ padding: '24px 32px', textAlign: 'center' }}>
+                             <div style={{ display: 'flex', gap: '16px', color: '#94a3b8', justifyContent: 'center' }}>
+                                <Edit2 size={18} style={{ cursor: 'pointer' }} /> 
+                                <Trash2 size={18} style={{ cursor: 'pointer' }} />
+                             </div>
+                          </td>
+                       </tr>
+                    ))}
+                 </tbody>
+              </table>
+           </div>
+       </div>
+
+       {/* Optional Menu Section for Restaurants */}
+       {locationData.type === 'Nhà hàng' && renderServiceSection('Quản lý thực đơn món ăn')}
     </div>
   );
 
@@ -267,14 +344,6 @@ const LocationEditPage: React.FC = () => {
                 </div>
              ))}
           </div>
-          <div style={{ width: '300px', padding: '24px', background: '#F0F9FF', borderRadius: '16px', border: '1px solid #E0F2FE' }}>
-             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#3b82f6', marginBottom: '12px' }}>
-                <Sparkles size={16} /> <span style={{ fontSize: '12px', fontWeight: '800', textTransform: 'uppercase' }}>AI Insight</span>
-             </div>
-             <p style={{ fontSize: '13px', color: '#0c4a6e', lineHeight: '1.6', fontStyle: 'italic', fontWeight: '500' }}>
-               "{locationData.reviews.aiInsight}"
-             </p>
-          </div>
        </div>
 
        <div>
@@ -285,11 +354,6 @@ const LocationEditPage: React.FC = () => {
              </select>
              <Button variant="outline" style={{ borderRadius: '10px', fontSize: '13px', padding: '8px 20px', background: '#EFF6FF', borderColor: '#3b82f6', color: '#3b82f6', fontWeight: '700' }}>Mới nhất</Button>
              <Button variant="outline" style={{ borderRadius: '10px', fontSize: '13px', padding: '8px 20px', color: '#64748b' }}>Có hình ảnh</Button>
-             <div style={{ width: '1px', height: '24px', background: '#E2E8F0', margin: '0 8px' }}></div>
-             <span style={{ fontSize: '11px', fontWeight: '800', color: '#94a3b8', textTransform: 'uppercase' }}>AI TOPICS:</span>
-             <span style={{ padding: '6px 14px', background: '#F0FDF4', color: '#16a34a', borderRadius: '8px', fontSize: '12px', fontWeight: '700' }}>Món ăn ngon</span>
-             <span style={{ padding: '6px 14px', background: '#EFF6FF', color: '#3b82f6', borderRadius: '8px', fontSize: '12px', fontWeight: '700' }}>View đẹp</span>
-             <span style={{ padding: '6px 14px', background: '#FFF7ED', color: '#ea580c', borderRadius: '8px', fontSize: '12px', fontWeight: '700' }}>Phục vụ chậm</span>
           </div>
        </div>
 
@@ -321,16 +385,34 @@ const LocationEditPage: React.FC = () => {
 
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                    <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                      <span style={{ fontSize: '10px', fontWeight: '800', color: '#94a3b8', textTransform: 'uppercase' }}>AI SENTIMENT:</span>
                       {rev.tags.map(tag => (
-                          <span key={tag.name} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '4px 12px', background: tag.color + '10', color: tag.color, borderRadius: '8px', fontSize: '12px', fontWeight: '700' }}>
-                             <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: tag.color }}></div>
+                          <span key={tag.name} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '4px 12px', background: '#F1F5F9', color: '#64748b', borderRadius: '8px', fontSize: '12px', fontWeight: '700' }}>
                              {tag.name}
                           </span>
                       ))}
                    </div>
-                   <Button variant="outline" style={{ borderRadius: '10px', fontSize: '13px', padding: '6px 20px', color: '#3b82f6', borderColor: '#EFF6FF', background: '#EFF6FF' }}>Trả lời</Button>
+                   <Button 
+                     variant="outline" 
+                     onClick={() => setReplyingToId(replyingToId === rev.id ? null : rev.id)}
+                     style={{ borderRadius: '10px', fontSize: '13px', padding: '6px 20px', color: '#3b82f6', borderColor: '#EFF6FF', background: '#EFF6FF' }}
+                   >
+                     {replyingToId === rev.id ? 'Hủy' : 'Trả lời'}
+                   </Button>
                 </div>
+
+                {replyingToId === rev.id && (
+                   <div style={{ marginTop: '24px', padding: '24px', background: '#F8FAFC', borderRadius: '16px', border: '1px solid #F1F5F9', animation: 'fadeIn 0.2s ease-out' }}>
+                      <label style={{ fontSize: '13px', fontWeight: '700', color: '#1e293b', display: 'block', marginBottom: '12px' }}>Nội dung phản hồi khách hàng</label>
+                      <textarea 
+                         placeholder="Cảm ơn bạn đã phản hồi, chúng tôi sẽ sớm cải thiện..."
+                         style={{ width: '100%', minHeight: '100px', padding: '16px', borderRadius: '12px', border: '1px solid #E2E8F0', outline: 'none', fontSize: '14px', lineHeight: '1.6', marginBottom: '16px', resize: 'vertical' }}
+                      />
+                      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
+                         <Button variant="outline" onClick={() => setReplyingToId(null)} style={{ padding: '8px 20px', borderRadius: '8px', fontSize: '13px' }}>Hủy bỏ</Button>
+                         <Button onClick={() => setReplyingToId(null)} style={{ padding: '8px 24px', borderRadius: '8px', fontSize: '13px' }}>Gửi phản hồi</Button>
+                      </div>
+                   </div>
+                )}
              </div>
           ))}
        </div>

@@ -395,10 +395,6 @@ const AddLocationPage: React.FC = () => {
                 </div>
 
                 <div style={{ marginBottom: '40px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', fontWeight: '800', color: '#3b82f6', textTransform: 'uppercase', marginBottom: '8px', letterSpacing: '0.5px' }}>
-                    <span>Tiến trình: Bước {step}</span>
-                    <span>{step === 1 ? '33%' : step === 2 ? '66%' : '100%'}</span>
-                    </div>
                     <div style={{ height: '6px', background: '#f1f5f9', borderRadius: '3px', overflow: 'hidden' }}>
                     <div style={{ width: step === 1 ? '33%' : step === 2 ? '66%' : '100%', height: '100%', background: '#3b82f6', borderRadius: '3px', transition: 'width 0.3s ease' }}></div>
                     </div>
@@ -456,7 +452,7 @@ const AddLocationPage: React.FC = () => {
                     )}
 
                     <Button onClick={handleNext} style={{ gap: '8px', padding: '12px 32px', borderRadius: '12px' }}>
-                        {step === 2 ? 'Tiếp tục' : 'Hoàn tất'}
+                        {step === 1 ? 'Tiếp theo' : 'Tiếp tục'}
                         <ArrowRight size={18} />
                     </Button>
                 </div>
