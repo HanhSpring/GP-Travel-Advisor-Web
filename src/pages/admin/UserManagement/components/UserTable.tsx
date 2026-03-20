@@ -104,7 +104,11 @@ export const UserTable: React.FC<UserTableProps> = ({
                   <span className="date-text">{user.joinedDate}</span>
                 </td>
                 <td className="td-actions" data-label="Thao tác" onClick={(e) => e.stopPropagation()}>
-                  <button className="action-btn text-blue" title="Chỉnh sửa">
+                  <button
+                    className="action-btn text-blue"
+                    title="Chỉnh sửa"
+                    onClick={() => navigate(`/admin/users/${user.id}`)}
+                  >
                     <Pencil size={16} />
                   </button>
                   <button className="action-btn text-red" title="Xóa">

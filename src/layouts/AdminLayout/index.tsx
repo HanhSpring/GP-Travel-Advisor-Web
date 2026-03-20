@@ -24,10 +24,10 @@ export const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children 
         <div className="sidebar-menu">
           <div className="menu-group">
             <h4 className="menu-title">TỔNG QUAN</h4>
-            <a href="#" className="menu-item">
+            <Link to="/admin" className={`menu-item ${location.pathname === '/admin' || location.pathname === '/admin/users' ? 'active' : ''}`}>
               <LayoutDashboard size={20} />
               <span>Dashboard</span>
-            </a>
+            </Link>
           </div>
 
           <div className="menu-group">
@@ -51,10 +51,10 @@ export const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children 
         </div>
 
         <div className="sidebar-footer">
-          <a href="#" className="menu-item logout">
+          <Link to="/auth/login" className="menu-item logout">
             <LogOut size={20} />
             <span>Đăng xuất</span>
-          </a>
+          </Link>
         </div>
       </aside>
 

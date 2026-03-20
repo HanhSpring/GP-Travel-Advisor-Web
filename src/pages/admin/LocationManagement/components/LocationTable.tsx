@@ -1,6 +1,6 @@
 import React from 'react';
 import { Location } from '../../../../types/location';
-import { Pencil, Eye, Check, X, Image as ImageIcon } from 'lucide-react';
+import { Pencil, Check, X, Image as ImageIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface LocationTableProps {
@@ -131,9 +131,6 @@ export const LocationTable: React.FC<LocationTableProps> = ({
                   <div className="action-buttons">
                     {loc.status === 'Chờ duyệt' && (
                       <>
-                        <button className="action-btn btn-view" title="Xem chi tiết" onClick={() => navigate(`/admin/locations/${loc.id}`)}>
-                          <Eye size={16} />
-                        </button>
                         <button className="action-btn btn-approve" title="Duyệt">
                           <Check size={16} />
                         </button>

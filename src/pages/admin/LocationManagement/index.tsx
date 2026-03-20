@@ -72,10 +72,10 @@ export const LocationManagement: React.FC = () => {
           <div className="user-avatar-small">
             <span className="avatar-text">AD</span>
           </div>
-          <button className="btn-primary">
+          <Link to="/admin/locations/add" className="btn-primary">
             <Plus size={18} />
             <span>Thêm địa điểm</span>
-          </button>
+          </Link>
         </div>
       </header>
 

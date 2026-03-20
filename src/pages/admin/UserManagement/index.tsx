@@ -80,10 +80,10 @@ export const UserManagement: React.FC = () => {
           <div className="user-avatar-small">
             <span className="avatar-text">AD</span>
           </div>
-          <button className="btn-primary">
+          <Link to="/admin/users/add" className="btn-primary">
             <Plus size={18} />
             <span>Thêm người dùng</span>
-          </button>
+          </Link>
         </div>
       </header>
 

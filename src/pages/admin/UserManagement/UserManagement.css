@@ -334,12 +334,19 @@
   color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  border-bottom: 2px solid var(--border-color);
   white-space: nowrap;
 }
 
-.user-table td {
+.user-table thead tr {
+  border-bottom: 2px solid var(--border-color);
+}
+
+.user-table tbody tr {
   border-bottom: 1px solid var(--border-color);
+}
+
+.user-table td {
+  border: none; /* Reset individual cell borders to use row border */
 }
 
 /* ── Column flex definitions ─────────────────
