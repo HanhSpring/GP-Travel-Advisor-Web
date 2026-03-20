@@ -23,7 +23,7 @@ export interface Order {
     ordered: string;
     expected: string;
   };
-  status: 'confirm' | 'cooking';
+  status: 'confirm' | 'cooking' | 'completed';
   statusText: string;
 }
 
@@ -103,5 +103,30 @@ export const mockOrders: Order[] = [
     },
     status: 'confirm',
     statusText: 'Chờ xác nhận'
+  },
+  {
+    id: 'ORD-004',
+    time: '12:30 PM',
+    customer: {
+      name: 'Võ Thị D',
+      phone: '094xxxxxxx',
+      email: 'vothid@email.com',
+      location: 'Khu vực Cần Thơ',
+      avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=120&h=120&fit=crop',
+      label: 'Khách hàng thân thiết',
+      detail: 'Bàn số 8'
+    },
+    items: [
+      { name: 'Cơm tấm Sườn Bì Chả', quantity: 2, price: '110.000đ' },
+      { name: 'Cà phê đá', quantity: 2, price: '30.000đ' },
+    ],
+    total: '140.000đ',
+    note: '"Nhiều mỡ hành"',
+    timeInfo: {
+      ordered: '12:30, 24/05/2024',
+      expected: '13:00, 24/05/2024'
+    },
+    status: 'completed',
+    statusText: 'Hoàn thành'
   }
 ];

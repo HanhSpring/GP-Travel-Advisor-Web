@@ -1,15 +1,13 @@
 import React, { useState } from 'react';
 import ProviderLayout from '../../../layouts/ProviderLayout/ProviderLayout';
 import Button from '../../../components/UI/Button';
-import { Search, RotateCw, ChevronLeft, ChevronRight, Eye, Edit3, Trash2, Plus, Star } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight, Edit3, Trash2, Plus, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { mockLocations } from '../../../mocks/locations';
 
 const LocationsPage: React.FC = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('Tất cả');
   const [currentPage, setCurrentPage] = useState(1);
-  const tabs = ['Tất cả', 'Phổ biến nhất', 'Mới đăng ký'];
 
   const locations = mockLocations;
 
@@ -17,7 +15,7 @@ const LocationsPage: React.FC = () => {
     <ProviderLayout>
       <div style={{ padding: '0 20px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
-          <h2 style={{ fontSize: '24px', fontWeight: '800', color: '#1e293b' }}>Danh sách địa điểm quản lý</h2>
+          <h2 style={{ fontSize: '28px', fontWeight: '800', color: '#000000', fontFamily: "'Times New Roman', Times, serif" }}>Danh sách địa điểm quản lý</h2>
           <Button onClick={() => navigate('/add-location')} style={{ gap: '8px', padding: '10px 24px', borderRadius: '12px' }}>
             <Plus size={18} /> Thêm địa điểm
           </Button>
@@ -39,47 +37,20 @@ const LocationsPage: React.FC = () => {
             </select>
             <ChevronLeft size={16} style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%) rotate(-90deg)', color: '#94a3b8', pointerEvents: 'none' }} />
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#64748b', fontSize: '14px' }}>
-            <div style={{ width: '20px', height: '20px', border: '2px solid #E2E8F0', borderRadius: '4px' }}></div>
-            <span>Có món ăn</span>
-          </div>
-          <button style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer' }}><RotateCw size={18} /></button>
         </div>
 
-        {/* Tabs */}
-        <div style={{ display: 'flex', gap: '32px', marginBottom: '32px', borderBottom: '1px solid #F1F5F9' }}>
-          {tabs.map(tab => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              style={{
-                padding: '12px 0',
-                fontSize: '14px',
-                fontWeight: activeTab === tab ? '700' : '600',
-                color: activeTab === tab ? '#3b82f6' : '#64748b',
-                background: 'transparent',
-                border: 'none',
-                borderBottom: activeTab === tab ? '2px solid #3b82f6' : '2px solid transparent',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                marginBottom: '-1px'
-              }}
-            >
-              {tab}
-            </button>
-          ))}
-        </div>
+
 
         {/* Table Container */}
         <div style={{ background: 'white', borderRadius: '24px', border: '1px solid #F1F5F9', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.02)' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ textAlign: 'left', background: '#FCFCFD', borderBottom: '1px solid #F1F5F9' }}>
-                <th style={{ padding: '20px 24px', fontSize: '11px', fontWeight: '800', color: '#94a3b8', textTransform: 'uppercase' }}>Tên địa điểm</th>
-                <th style={{ padding: '20px 24px', fontSize: '11px', fontWeight: '800', color: '#94a3b8', textTransform: 'uppercase' }}>Loại hình</th>
-                <th style={{ padding: '20px 24px', fontSize: '11px', fontWeight: '800', color: '#94a3b8', textTransform: 'uppercase' }}>Đánh giá</th>
-                <th style={{ padding: '20px 24px', fontSize: '11px', fontWeight: '800', color: '#94a3b8', textTransform: 'uppercase' }}>Trạng thái</th>
-                <th style={{ padding: '20px 24px', fontSize: '11px', fontWeight: '800', color: '#94a3b8', textTransform: 'uppercase' }}>Thao tác</th>
+                <th style={{ padding: '20px 24px', fontSize: '15px', fontWeight: '800', color: '#000000', fontFamily: "'Times New Roman', Times, serif" }}>Tên địa điểm</th>
+                <th style={{ padding: '20px 24px', fontSize: '15px', fontWeight: '800', color: '#000000', fontFamily: "'Times New Roman', Times, serif" }}>Loại hình</th>
+                <th style={{ padding: '20px 24px', fontSize: '15px', fontWeight: '800', color: '#000000', fontFamily: "'Times New Roman', Times, serif" }}>Đánh giá</th>
+                <th style={{ padding: '20px 24px', fontSize: '15px', fontWeight: '800', color: '#000000', fontFamily: "'Times New Roman', Times, serif" }}>Trạng thái</th>
+                <th style={{ padding: '20px 24px', fontSize: '15px', fontWeight: '800', color: '#000000', fontFamily: "'Times New Roman', Times, serif" }}>Thao tác</th>
               </tr>
             </thead>
             <tbody>
@@ -128,7 +99,6 @@ const LocationsPage: React.FC = () => {
                   </td>
                   <td style={{ padding: '20px 24px' }}>
                     <div style={{ display: 'flex', gap: '16px', color: '#94a3b8' }}>
-                      <Eye size={18} style={{ cursor: 'pointer' }} />
                       <Edit3 size={18} style={{ cursor: 'pointer' }} onClick={() => navigate(`/locations/${loc.id}`)} />
                       <Trash2 size={18} style={{ cursor: 'pointer' }} />
                     </div>

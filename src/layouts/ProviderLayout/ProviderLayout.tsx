@@ -81,46 +81,31 @@ const ProviderLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =
           <SidebarItem icon={<ShoppingBag size={20} />} label="Đơn đặt món" to="/orders" badge={12} />
           <SidebarItem icon={<Settings size={20} />} label="Cài đặt" to="/settings" />
         </nav>
-
-        {/* Sidebar Footer User */}
-        <div style={{ 
-          marginTop: 'auto', 
-          padding: '16px', 
-          background: 'rgba(255, 255, 255, 0.1)', 
-          borderRadius: '16px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '12px'
-        }}>
-          <div 
-            onClick={() => navigate('/profile')}
-            style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }}
-          >
-            <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=80&h=80&fit=crop" alt="User" style={{ width: '40px', height: '40px', borderRadius: '12px', objectFit: 'cover' }} />
-            <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
-              <span style={{ fontWeight: '700', fontSize: '14px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Nguyễn Văn A</span>
-              <span style={{ fontSize: '11px', opacity: 0.7 }}>Đối tác</span>
-            </div>
-          </div>
+        
+        {/* Sidebar Footer */}
+        <div style={{ marginTop: 'auto', padding: '0 8px' }}>
           <button 
             style={{ 
+              width: '100%',
               background: 'transparent', 
               color: 'white', 
-              opacity: 0.7, 
-              padding: '8px 0', 
+              opacity: 0.8, 
+              padding: '12px 16px', 
               border: 'none', 
               cursor: 'pointer', 
               display: 'flex', 
               alignItems: 'center', 
-              gap: '8px',
-              fontSize: '13px',
+              gap: '12px',
+              fontSize: '14px',
               fontWeight: '600',
-              marginTop: '8px'
+              borderRadius: '12px',
+              transition: 'all 0.2s',
+              marginBottom: '10px'
             }} 
             onClick={() => navigate('/login')}
           >
+            <LogOut size={20} />
             <span>Đăng xuất</span>
-            <LogOut size={16} />
           </button>
         </div>
       </aside>

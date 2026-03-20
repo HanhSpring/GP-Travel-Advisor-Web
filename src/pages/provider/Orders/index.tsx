@@ -7,10 +7,10 @@ import { mockOrders } from '../../../mocks/orders';
 
 const OrdersPage: React.FC = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('Chờ xác nhận (3)');
-  const tabs = ['Tất cả', 'Chờ xác nhận (3)', 'Đang chuẩn bị', 'Lịch sử'];
-
   const orders = mockOrders;
+  const pendingCount = orders.filter(o => o.status === 'confirm').length;
+  const [activeTab, setActiveTab] = useState(`Chờ xác nhận (${pendingCount})`);
+  const tabs = ['Tất cả', `Chờ xác nhận (${pendingCount})`, 'Đang chuẩn bị'];
 
   return (
     <ProviderLayout>
@@ -94,10 +94,15 @@ const OrdersPage: React.FC = () => {
                   <td style={{ padding: '24px' }}>
                     {order.status === 'confirm' ? (
                       <Button style={{ padding: '8px 16px', fontSize: '12px', borderRadius: '8px' }}>Xác nhận</Button>
+                    ) : order.status === 'completed' ? (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#10b981', fontSize: '12px', fontWeight: '700' }}>
+                        <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10b981' }}></div>
+                        Hoàn thành
+                      </div>
                     ) : (
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#f59e0b', fontSize: '12px', fontWeight: '700' }}>
                         <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#f59e0b' }}></div>
-                        Đang nấu
+                        Đang chuẩn bị
                       </div>
                     )}
                   </td>
@@ -105,8 +110,8 @@ const OrdersPage: React.FC = () => {
               ))}
             </tbody>
           </table>
-          <div style={{ padding: '20px 24px', borderTop: '1px solid #F1F5F9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '13px', color: '#94a3b8' }}>Hiển thị 1 - 3 của 3 đơn hàng</span>
+          <div style={{ padding: '20px 24px', borderTop: '1px solid #F1F5F9', display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+
             <div style={{ display: 'flex', gap: '8px' }}>
               <button style={{ width: '32px', height: '32px', borderRadius: '8px', border: '1px solid #F1F5F9', background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#E2E8F0', cursor: 'not-allowed' }}>
                 <ChevronLeft size={16} />
