@@ -3,8 +3,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import AuthLayout from '../../../layouts/AuthLayout/AuthLayout';
 import Input from '../../../components/UI/Input';
 import Button from '../../../components/UI/Button';
-import { Mail, Lock, Eye, EyeOff, Chrome, Linkedin } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, Chrome, Linkedin, AlertCircle } from 'lucide-react';
 import loginBg from '../../../assets/login-bg.png';
+import { MOCK_USERS } from '../../../mocks/users';
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
@@ -15,12 +16,38 @@ const LoginPage: React.FC = () => {
     remember: false
   });
 
+  const [error, setError] = useState('');
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Login attempt:', formData);
-    // Authentication logic would go here
-    // Redirect to dashboard on success
-    navigate('/dashboard');
+    setError('');
+    
+    // Find matching mock user
+    const user = MOCK_USERS.find(
+      u => u.email === formData.email && u.password === formData.password
+    );
+
+    if (user) {
+      // Mock success
+      // Save info to localStorage for authService.getCurrentUser() to work
+      localStorage.setItem('token', 'mock-token-' + user.id);
+      localStorage.setItem('user', JSON.stringify({
+        id: user.id,
+        email: user.email,
+        fullName: user.fullName,
+        role: user.role,
+        avatar: user.avatar
+      }));
+
+      // Role-based redirection
+      if (user.role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/dashboard');
+      }
+    } else {
+      setError('Email hoặc mật khẩu không chính xác!');
+    }
   };
 
   return (
@@ -33,6 +60,25 @@ const LoginPage: React.FC = () => {
           Chào mừng trở lại! Vui lòng nhập thông tin để truy cập hệ thống quản trị.
         </p>
       </div>
+
+      {error && (
+        <div style={{ 
+          background: 'rgba(255, 71, 71, 0.1)', 
+          color: '#ff4747', 
+          padding: '12px 16px', 
+          borderRadius: '8px', 
+          marginBottom: '24px',
+          fontSize: '14px',
+          fontWeight: '500',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          border: '1px solid rgba(255, 71, 71, 0.2)'
+        }}>
+          <AlertCircle size={18} />
+          {error}
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column' }}>
         <Input 
