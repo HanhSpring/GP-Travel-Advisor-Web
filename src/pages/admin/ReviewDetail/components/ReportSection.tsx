@@ -23,7 +23,6 @@ export const ReportSection: React.FC<ReportSectionProps> = ({
         </div>
         <div className="ai-status-badge">
           <ShieldAlert size={14} />
-          <span>Hệ thống tự động phát hiện</span>
         </div>
       </div>
 
