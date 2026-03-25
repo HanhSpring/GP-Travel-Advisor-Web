@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import ProviderLayout from '../../../layouts/ProviderLayout/ProviderLayout';
-import { Building2, Utensils, BookOpen, Star } from 'lucide-react';
+import { Building2, Utensils, BookOpen, Star, ArrowUpDown, ChevronUp, ChevronDown } from 'lucide-react';
 
 
 interface StatCardProps {
@@ -52,7 +52,15 @@ const StatCard: React.FC<StatCardProps> = ({ icon, label, value, change, badge, 
   </div>
 );
 
+type SortKey = 'name' | 'location' | 'category' | 'price' | 'orders';
+type SortDirection = 'asc' | 'desc';
+
 const DashboardPage: React.FC = () => {
+  const [sortConfig, setSortConfig] = useState<{ key: SortKey; direction: SortDirection }>({ 
+    key: 'orders', 
+    direction: 'desc' 
+  });
+
   const allData = [
     { id: 1, name: 'Nhà hàng Biển Đông', address: '24 Trần Phú, Nha Trang', type: 'NHÀ HÀNG', status: 'Đã duyệt', rating: 4.9, img: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=100&h=100&fit=crop' },
     { id: 2, name: 'Khách sạn Mường Thanh', address: '60 Võ Nguyên Giáp, Đà Nẵng', type: 'LƯU TRÚ', status: 'Đã duyệt', rating: 4.7, img: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=100&h=100&fit=crop' },
@@ -62,11 +70,64 @@ const DashboardPage: React.FC = () => {
     { id: 5, name: 'Resort Hòa Bình', address: 'Bãi biển Mỹ Khê, Đà Nẵng', type: 'LƯU TRÚ', status: 'Đã duyệt', rating: 4.8, img: 'https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=100&h=100&fit=crop' },
   ];
 
+  const servicesData = [
+    { id: 1, name: 'Lẩu hải sản đặc biệt', location: 'Nhà hàng Biển Đông', category: 'Món ăn', priceValue: 350000, price: '350.000đ', orders: 156, rating: 4.9, img: 'https://images.unsplash.com/photo-1555126634-323283e090fa?auto=format&fit=crop&w=200&q=80' },
+    { id: 2, name: 'Cua rang me', location: 'Nhà hàng Biển Đông', category: 'Món ăn', priceValue: 450000, price: '450.000đ', orders: 128, rating: 4.8, img: 'https://images.unsplash.com/photo-1559737558-2f5a35f4523b?auto=format&fit=crop&w=200&q=80' },
+    { id: 3, name: 'Gỏi cá mai', location: 'Nhà hàng Biển Đông', category: 'Món ăn', priceValue: 120000, price: '120.000đ', orders: 95, rating: 4.7, img: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=200&q=80' },
+    { id: 4, name: 'Tôm hùm nướng bơ tỏi', location: 'Nhà hàng Biển Đông', category: 'Món ăn', priceValue: 850000, price: '850.000đ', orders: 82, rating: 5.0, img: 'https://images.unsplash.com/photo-1559742811-824289511f48?auto=format&fit=crop&w=200&q=80' },
+    { id: 5, name: 'Thuê xe máy SH', location: 'Dịch vụ Thuê xe máy', category: 'Dịch vụ', priceValue: 250000, price: '250.000đ', orders: 64, rating: 4.6, img: 'https://images.unsplash.com/photo-1558981403-c5f91cbba527?auto=format&fit=crop&w=200&h=200&fit=crop' },
+    { id: 6, name: 'Phòng Deluxe Sea View', location: 'Khách sạn Mường Thanh', category: 'Phòng nghỉ', priceValue: 1200000, price: '1.200.000đ', orders: 45, rating: 4.9, img: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=200&q=80' },
+    { id: 7, name: ' Buffet sáng cao cấp', location: 'Khách sạn Mường Thanh', category: 'Dịch vụ', priceValue: 250000, price: '250.000đ', orders: 210, rating: 4.5, img: 'https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?auto=format&fit=crop&w=200&q=80' },
+    { id: 8, name: 'Cà phê muối đặc biệt', location: 'Quán Coffee Sky', category: 'Đồ uống', priceValue: 45000, price: '45.000đ', orders: 320, rating: 4.9, img: 'https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?auto=format&fit=crop&w=200&q=80' },
+    { id: 9, name: 'Trà trái cây nhiệt đới', location: 'Quán Coffee Sky', category: 'Đồ uống', priceValue: 55000, price: '55.000đ', orders: 180, rating: 4.7, img: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=200&q=80' },
+    { id: 10, name: 'Tour lặn ngắm san hô', location: 'Nhà hàng Biển Đông', category: 'Dịch vụ', priceValue: 650000, price: '650.000đ', orders: 32, rating: 4.8, img: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=200&q=80' },
+  ];
+
+  const sortedData = useMemo(() => {
+    let sortableData = [...servicesData];
+    if (sortConfig.key) {
+      sortableData.sort((a, b) => {
+        let aValue: any = a[sortConfig.key];
+        let bValue: any = b[sortConfig.key];
+
+        // Special handling for pricing
+        if (sortConfig.key === 'price') {
+           aValue = a.priceValue;
+           bValue = b.priceValue;
+        }
+
+        if (aValue < bValue) {
+          return sortConfig.direction === 'asc' ? -1 : 1;
+        }
+        if (aValue > bValue) {
+          return sortConfig.direction === 'asc' ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+    return sortableData;
+  }, [sortConfig, servicesData]);
+
+  const requestSort = (key: SortKey) => {
+    let direction: SortDirection = 'asc';
+    if (sortConfig.key === key && sortConfig.direction === 'asc') {
+      direction = 'desc';
+    }
+    setSortConfig({ key, direction });
+  };
+
+  const renderSortIndicator = (key: SortKey) => {
+    if (sortConfig.key !== key) return <ArrowUpDown size={14} style={{ marginLeft: '8px', opacity: 0.3 }} />;
+    return sortConfig.direction === 'asc' ? 
+      <ChevronUp size={14} style={{ marginLeft: '8px', color: '#3b82f6' }} /> : 
+      <ChevronDown size={14} style={{ marginLeft: '8px', color: '#3b82f6' }} />;
+  };
+
   return (
     <ProviderLayout>
       {/* Stats Grid */}
       <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap', marginBottom: '40px' }}>
-        <StatCard icon={<Building2 size={24} />} label="Tổng địa điểm" value={allData.length} change="+2%" />
+        <StatCard icon={<Building2 size={24} />} label="Địa điểm đã đăng ký" value={allData.length} change="+2%" />
         <StatCard icon={<Utensils size={24} />} label="Đơn đặt món mới" value="12" change="+12%" badge="CẦN XỬ LÝ" color="#f59e0b" />
         <StatCard icon={<BookOpen size={24} />} label="Món ăn đang bán" value="45" change="+5" color="#6366f1" />
         <StatCard icon={<Star size={24} />} label="Đánh giá trung bình" value="4.8" change="★★★★★" color="#eab308" />
@@ -75,8 +136,8 @@ const DashboardPage: React.FC = () => {
       {/* Main Section Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '24px' }}>
         <div>
-          <h3 style={{ fontSize: '28px', fontWeight: '800', color: '#000000', fontFamily: "'Times New Roman', Times, serif", marginBottom: '4px' }}>Top 5 Món ăn / Dịch vụ Hot nhất</h3>
-          <p style={{ fontSize: '14px', color: '#64748b' }}>Thống kê các dịch vụ có lượt đặt cao nhất trong tháng này.</p>
+          <h3 style={{ fontSize: '28px', fontWeight: '800', color: '#000000', fontFamily: "'Times New Roman', Times, serif", marginBottom: '4px' }}>Hiệu suất Sản phẩm / Dịch vụ</h3>
+          <p style={{ fontSize: '14px', color: '#64748b' }}>Thống kê chi tiết tất cả các dịch vụ đang kinh doanh.</p>
         </div>
         <div style={{ display: 'flex', gap: '12px' }}>
             <select style={{ 
@@ -90,14 +151,29 @@ const DashboardPage: React.FC = () => {
                 color: '#1e293b',
                 cursor: 'pointer'
             }}>
-                <option>Tháng 03/2024</option>
-                <option>Tháng 02/2024</option>
-                <option>Tháng 01/2024</option>
+                {Array.from({ length: 12 }, (_, i) => (
+                    <option key={i + 1} value={i + 1}>Tháng {(i + 1).toString().padStart(2, '0')}</option>
+                ))}
+            </select>
+            <select style={{ 
+                padding: '10px 16px', 
+                borderRadius: '12px', 
+                border: '1px solid #E2E8F0', 
+                background: 'white',
+                fontSize: '14px',
+                fontWeight: '600',
+                outline: 'none',
+                color: '#1e293b',
+                cursor: 'pointer'
+            }} defaultValue="2024">
+                {Array.from({ length: 2030 - 2010 + 1 }, (_, i) => (
+                    <option key={2010 + i} value={2010 + i}>Năm {2010 + i}</option>
+                ))}
             </select>
         </div>
       </div>
 
-      {/* Top 5 Table Section */}
+      {/* Services Table Section */}
       <div style={{ 
         background: 'white', 
         borderRadius: '24px', 
@@ -108,22 +184,50 @@ const DashboardPage: React.FC = () => {
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr style={{ borderBottom: '1px solid #F1F5F9' }}>
-              <th style={{ textAlign: 'left', padding: '20px 24px', fontSize: '15px', color: '#000000', fontWeight: '800', fontFamily: "'Times New Roman', Times, serif" }}>Sản phẩm / Dịch vụ</th>
-              <th style={{ textAlign: 'left', padding: '20px 24px', fontSize: '15px', color: '#000000', fontWeight: '800', fontFamily: "'Times New Roman', Times, serif" }}>Địa điểm</th>
-              <th style={{ textAlign: 'left', padding: '20px 24px', fontSize: '15px', color: '#000000', fontWeight: '800', fontFamily: "'Times New Roman', Times, serif" }}>Phân loại</th>
-              <th style={{ textAlign: 'center', padding: '20px 24px', fontSize: '15px', color: '#000000', fontWeight: '800', fontFamily: "'Times New Roman', Times, serif" }}>Giá bán</th>
-              <th style={{ textAlign: 'center', padding: '20px 24px', fontSize: '15px', color: '#000000', fontWeight: '800', fontFamily: "'Times New Roman', Times, serif" }}>Lượt đặt tháng</th>
+              <th 
+                onClick={() => requestSort('name')}
+                style={{ textAlign: 'left', padding: '20px 24px', fontSize: '15px', color: '#000000', fontWeight: '800', fontFamily: "'Times New Roman', Times, serif", cursor: 'pointer', userSelect: 'none' }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  Sản phẩm / Dịch vụ {renderSortIndicator('name')}
+                </div>
+              </th>
+              <th 
+                style={{ textAlign: 'left', padding: '20px 24px', fontSize: '15px', color: '#000000', fontWeight: '800', fontFamily: "'Times New Roman', Times, serif", userSelect: 'none' }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  Địa điểm
+                </div>
+              </th>
+              <th 
+                onClick={() => requestSort('category')}
+                style={{ textAlign: 'left', padding: '20px 24px', fontSize: '15px', color: '#000000', fontWeight: '800', fontFamily: "'Times New Roman', Times, serif", cursor: 'pointer', userSelect: 'none' }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  Phân loại {renderSortIndicator('category')}
+                </div>
+              </th>
+              <th 
+                onClick={() => requestSort('price')}
+                style={{ padding: '20px 24px', fontSize: '15px', color: '#000000', fontWeight: '800', fontFamily: "'Times New Roman', Times, serif", cursor: 'pointer', userSelect: 'none' }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  Giá bán {renderSortIndicator('price')}
+                </div>
+              </th>
+              <th 
+                onClick={() => requestSort('orders')}
+                style={{ padding: '20px 24px', fontSize: '15px', color: '#000000', fontWeight: '800', fontFamily: "'Times New Roman', Times, serif", cursor: 'pointer', userSelect: 'none' }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  Lượt đặt {renderSortIndicator('orders')}
+                </div>
+              </th>
             </tr>
           </thead>
           <tbody>
-            {[
-              { id: 1, name: 'Lẩu hải sản đặc biệt', location: 'Nhà hàng Biển Đông', category: 'Món ăn', price: '350.000đ', orders: 156, rating: 4.9, img: 'https://images.unsplash.com/photo-1555126634-323283e090fa?auto=format&fit=crop&w=200&q=80' },
-              { id: 2, name: 'Cua rang me', location: 'Nhà hàng Biển Đông', category: 'Món ăn', price: '450.000đ', orders: 128, rating: 4.8, img: 'https://images.unsplash.com/photo-1559737558-2f5a35f4523b?auto=format&fit=crop&w=200&q=80' },
-              { id: 3, name: 'Gỏi cá mai', location: 'Nhà hàng Biển Đông', category: 'Món ăn', price: '120.000đ', orders: 95, rating: 4.7, img: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=200&q=80' },
-              { id: 4, name: 'Tôm hùm nướng bơ tỏi', location: 'Nhà hàng Biển Đông', category: 'Món ăn', price: '850.000đ', orders: 82, rating: 5.0, img: 'https://images.unsplash.com/photo-1559742811-824289511f48?auto=format&fit=crop&w=200&q=80' },
-              { id: 5, name: 'Thuê xe máy SH', location: 'Dịch vụ Thuê xe máy', category: 'Dịch vụ', price: '250.000đ', orders: 64, rating: 4.6, img: 'https://images.unsplash.com/photo-1558981403-c5f91cbba527?auto=format&fit=crop&w=200&q=80' },
-            ].sort((a, b) => b.orders - a.orders).map((item, index) => (
-              <tr key={item.id} style={{ borderBottom: index === 4 ? 'none' : '1px solid #F8FAFC' }}>
+            {sortedData.map((item, index) => (
+              <tr key={item.id} style={{ borderBottom: index === sortedData.length - 1 ? 'none' : '1px solid #F8FAFC' }}>
                 <td style={{ padding: '16px 24px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                     <div style={{ 
@@ -149,25 +253,27 @@ const DashboardPage: React.FC = () => {
                                 display: 'block'
                             }} 
                         />
-                        <span style={{ 
-                            position: 'absolute', 
-                            top: '-8px', 
-                            left: '-8px', 
-                            background: index === 0 ? '#F59E0B' : index === 1 ? '#94A3B8' : index === 2 ? '#B45309' : '#F1F5F9',
-                            color: index < 3 ? 'white' : '#64748B',
-                            width: '22px',
-                            height: '22px',
-                            borderRadius: '50%',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            fontSize: '11px',
-                            fontWeight: '800',
-                            border: '2px solid white',
-                            boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-                        }}>
-                            {index + 1}
-                        </span>
+                        {index < 3 && (
+                            <span style={{ 
+                                position: 'absolute', 
+                                top: '-8px', 
+                                left: '-8px', 
+                                background: index === 0 ? '#F59E0B' : index === 1 ? '#94A3B8' : index === 2 ? '#B45309' : 'transparent',
+                                color: 'white',
+                                width: '22px',
+                                height: '22px',
+                                borderRadius: '50%',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                fontSize: '11px',
+                                fontWeight: '800',
+                                border: '2px solid white',
+                                boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                            }}>
+                                {index + 1}
+                            </span>
+                        )}
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
                       <span style={{ fontWeight: '700', color: '#1e293b', fontSize: '15px' }}>{item.name}</span>
@@ -187,8 +293,8 @@ const DashboardPage: React.FC = () => {
                     borderRadius: '8px', 
                     fontSize: '11px', 
                     fontWeight: '800',
-                    background: item.category === 'Món ăn' ? '#DBEAFE' : '#F3E8FF',
-                    color: item.category === 'Món ăn' ? '#2563EB' : '#9333EA',
+                    background: item.category === 'Món ăn' ? '#DBEAFE' : item.category === 'Phòng nghỉ' ? '#DCFCE7' : '#F3E8FF',
+                    color: item.category === 'Món ăn' ? '#2563EB' : item.category === 'Phòng nghỉ' ? '#16A34A' : '#9333EA',
                     textTransform: 'uppercase'
                   }}>
                     {item.category}
@@ -198,7 +304,7 @@ const DashboardPage: React.FC = () => {
                   <span style={{ fontSize: '15px', fontWeight: '700', color: '#1e293b' }}>{item.price}</span>
                 </td>
                 <td style={{ padding: '16px 24px', textAlign: 'center' }}>
-                  <span style={{ fontSize: '16px', fontWeight: '800', color: '#1e293b' }}>{item.orders}</span>
+                  <span style={{ fontSize: '16px', fontWeight: '800', color: '#10b981' }}>{item.orders}</span>
                 </td>
               </tr>
             ))}

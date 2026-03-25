@@ -153,7 +153,6 @@ const ProviderLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', paddingLeft: '24px', borderLeft: '1px solid #F1F5F9' }}>
               <div style={{ textAlign: 'right' }}>
                 <p style={{ fontSize: '14px', fontWeight: '700', color: '#1e293b' }}>Nguyễn Văn A</p>
-                <p style={{ fontSize: '11px', color: '#64748b', fontWeight: '500' }}>Thành viên Vàng</p>
               </div>
               <div 
                 onClick={() => navigate('/profile')}

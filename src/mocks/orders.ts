@@ -13,7 +13,7 @@ export interface Order {
     email: string;
     location: string;
     avatar: string;
-    label: string;
+    label?: string;
     detail: string;
   };
   items: OrderItem[];
@@ -25,6 +25,7 @@ export interface Order {
   };
   status: 'confirm' | 'cooking' | 'completed';
   statusText: string;
+  restaurantName: string;
 }
 
 export const mockOrders: Order[] = [
@@ -37,7 +38,6 @@ export const mockOrders: Order[] = [
       email: 'nguyvana@email.com',
       location: 'Khu vực TP. Hồ Chí Minh',
       avatar: 'https://images.unsplash.com/photo-1543132220-3ce99c5ae497?w=120&h=120&fit=crop',
-      label: 'Khách hàng thân thiết',
       detail: 'Bàn số 5'
     },
     items: [
@@ -52,7 +52,8 @@ export const mockOrders: Order[] = [
       expected: '12:00, 24/05/2024'
     },
     status: 'confirm',
-    statusText: 'Chờ xác nhận'
+    statusText: 'Chờ xác nhận',
+    restaurantName: 'Nhà hàng Biển Đông'
   },
   {
     id: 'ORD-002',
@@ -63,7 +64,6 @@ export const mockOrders: Order[] = [
       email: 'tranthib@email.com',
       location: 'Khu vực Hà Nội',
       avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&h=120&fit=crop',
-      label: 'Khách hàng mới',
       detail: 'Mang về'
     },
     items: [
@@ -77,7 +77,8 @@ export const mockOrders: Order[] = [
       expected: '12:30, 24/05/2024'
     },
     status: 'cooking',
-    statusText: 'Đang chuẩn bị'
+    statusText: 'Đang chuẩn bị',
+    restaurantName: 'Nhà hàng Biển Đông'
   },
   {
     id: 'ORD-003',
@@ -88,7 +89,6 @@ export const mockOrders: Order[] = [
       email: 'leminhc@email.com',
       location: 'Khu vực Đà Nẵng',
       avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&h=120&fit=crop',
-      label: 'Khách hàng thân thiết',
       detail: 'Bàn số 12'
     },
     items: [
@@ -102,7 +102,8 @@ export const mockOrders: Order[] = [
       expected: '12:45, 24/05/2024'
     },
     status: 'confirm',
-    statusText: 'Chờ xác nhận'
+    statusText: 'Chờ xác nhận',
+    restaurantName: 'Nhà hàng Biển Đông'
   },
   {
     id: 'ORD-004',
@@ -113,7 +114,6 @@ export const mockOrders: Order[] = [
       email: 'vothid@email.com',
       location: 'Khu vực Cần Thơ',
       avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=120&h=120&fit=crop',
-      label: 'Khách hàng thân thiết',
       detail: 'Bàn số 8'
     },
     items: [
@@ -127,6 +127,7 @@ export const mockOrders: Order[] = [
       expected: '13:00, 24/05/2024'
     },
     status: 'completed',
-    statusText: 'Hoàn thành'
+    statusText: 'Hoàn thành',
+    restaurantName: 'Khách sạn Mường Thanh'
   }
 ];
