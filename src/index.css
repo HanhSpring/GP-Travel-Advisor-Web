@@ -155,6 +155,10 @@ a:hover {
   color: var(--secondary-blue);
 }
 
+.btn-primary:hover {
+  color: white !important;
+}
+
 button {
   cursor: pointer;
   border: none;

@@ -281,15 +281,7 @@ const ProviderLayout: React.FC = () => {
                 borderLeft: '1px solid #F1F5F9',
               }}>
               <div style={{ textAlign: 'right' }}>
-                <p
-                  style={{
-                    fontSize: '14px',
-                    fontWeight: '700',
-                    color: '#1e293b',
-                  }}>
-                  {/* 6. Thay tên tĩnh bằng state từ API */}
-                  {headerInfo.fullName}
-                </p>
+                <p style={{ fontSize: '14px', fontWeight: '700', color: '#1e293b' }}>Nguyễn Văn A</p>
               </div>
               <div
                 onClick={() => navigate('/profile')}

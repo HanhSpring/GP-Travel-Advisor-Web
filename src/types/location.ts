@@ -8,6 +8,7 @@ export interface Location {
   userAvatar: string;
   publishDate: string;
   status: 'Đã duyệt' | 'Chờ duyệt' | 'Từ chối';
+  rejectionReason?: string;
 }
 
 export interface LocationStatsInfo {

@@ -41,7 +41,7 @@ const fullContents = [
 ];
 
 const reportReasonsMap = [
-  ['Spam', 'Nội dung không phù hợp', 'Cáo buộc sai sự thật'],
+  ['Spam', 'Nội dung không phù hợp'],
   [],
   [],
   [],

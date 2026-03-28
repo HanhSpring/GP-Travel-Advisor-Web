@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Review } from '../../../../types/review';
-import { Star } from 'lucide-react';
+import { Star, ChevronDown, CheckCircle, AlertTriangle } from 'lucide-react';
 
 interface ReviewTableProps {
   reviews: Review[];
@@ -12,8 +12,93 @@ interface ReviewTableProps {
   onPageChange: (page: number) => void;
 }
 
+const STATUS_OPTIONS: Review['status'][] = ['Đã duyệt', 'Vi phạm'];
+
+const statusConfig: Record<Review['status'], { bg: string; text: string; dot: string; icon: React.ReactNode }> = {
+  'Đã duyệt': { bg: '#ccfbf1', text: '#0f766e', dot: '#0f766e', icon: <CheckCircle size={13} /> },
+  'Vi phạm':  { bg: '#fef2f2', text: '#ef4444', dot: '#ef4444', icon: <AlertTriangle size={13} /> },
+};
+
+/** Dropdown chỉnh trạng thái riêng lẻ */
+const StatusDropdown: React.FC<{
+  reviewId: string;
+  current: Review['status'];
+  onChange: (id: string, status: Review['status']) => void;
+}> = ({ reviewId, current, onChange }) => {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  const cfg = statusConfig[current];
+
+  return (
+    <div ref={ref} style={{ position: 'relative', display: 'inline-block' }} onClick={(e) => e.stopPropagation()}>
+      <button
+        onClick={() => setOpen(v => !v)}
+        style={{
+          display: 'inline-flex', alignItems: 'center', gap: '6px',
+          padding: '4px 10px', borderRadius: '100px',
+          backgroundColor: cfg.bg, color: cfg.text,
+          border: 'none', cursor: 'pointer', fontWeight: 600, fontSize: '0.78rem',
+          transition: 'opacity 0.15s',
+        }}
+      >
+        <span style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: cfg.dot, flexShrink: 0 }} />
+        {current}
+        <ChevronDown
+          size={12}
+          style={{ opacity: 0.7, marginLeft: 2, transition: 'transform 0.2s', transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}
+        />
+      </button>
+
+      {open && (
+        <div style={{
+          position: 'absolute', top: 'calc(100% + 6px)', right: 0, zIndex: 50,
+          background: 'white', borderRadius: '12px', boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+          border: '1px solid var(--border-color)', overflow: 'hidden', minWidth: '160px',
+        }}>
+          <div style={{ padding: '6px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+            {STATUS_OPTIONS.map((opt) => {
+              const oCfg = statusConfig[opt];
+              const isActive = opt === current;
+              return (
+                <button
+                  key={opt}
+                  onClick={() => { onChange(reviewId, opt); setOpen(false); }}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: '10px',
+                    padding: '9px 14px', borderRadius: '8px',
+                    background: isActive ? oCfg.bg : 'transparent',
+                    color: isActive ? oCfg.text : 'var(--text-secondary)',
+                    border: 'none', cursor: 'pointer', fontWeight: isActive ? 700 : 500,
+                    fontSize: '0.875rem', textAlign: 'left', width: '100%',
+                    transition: 'background 0.15s',
+                  }}
+                  onMouseEnter={e => { if (!isActive) (e.currentTarget as HTMLButtonElement).style.background = '#f8fafc'; }}
+                  onMouseLeave={e => { if (!isActive) (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; }}
+                >
+                  <span style={{ color: oCfg.text }}>{oCfg.icon}</span>
+                  {opt}
+                  {isActive && <span style={{ marginLeft: 'auto', width: 8, height: 8, borderRadius: '50%', backgroundColor: oCfg.dot }} />}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 export const ReviewTable: React.FC<ReviewTableProps> = ({
-  reviews,
+  reviews: initialReviews,
   loading,
   currentPage,
   totalItems,
@@ -21,75 +106,42 @@ export const ReviewTable: React.FC<ReviewTableProps> = ({
   onPageChange
 }) => {
   const navigate = useNavigate();
+  const [reviews, setReviews] = useState<Review[]>(initialReviews);
 
-  const renderStars = (rating: number) => {
-    return (
-      <div className="rv-stars">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <Star
-            key={i}
-            size={14}
-            fill={i < rating ? '#facc15' : 'none'}
-            color={i < rating ? '#facc15' : '#d1d5db'}
-          />
-        ))}
-      </div>
-    );
+  useEffect(() => { setReviews(initialReviews); }, [initialReviews]);
+
+  const handleStatusChange = (id: string, newStatus: Review['status']) => {
+    setReviews(prev => prev.map(r => r.id === id ? { ...r, status: newStatus } : r));
+    console.log(`[Mock] Cập nhật trạng thái đánh giá ${id} → ${newStatus}`);
   };
 
-  const renderBadge = (status: string) => {
-    let dotColor = '#64748b';
-    let bg = '#f1f5f9';
-    let text = '#64748b';
-
-    if (status === 'Đã duyệt') {
-      dotColor = '#0f766e'; bg = '#ccfbf1'; text = '#0f766e';
-    } else if (status === 'Vi phạm') {
-      dotColor = '#ef4444'; bg = '#fef2f2'; text = '#ef4444';
-    }
-
-    return (
-      <span className="rv-badge" style={{ backgroundColor: bg, color: text }}>
-        <span className="rv-badge-dot" style={{ backgroundColor: dotColor }}></span>
-        {status}
-      </span>
-    );
-  };
+  const renderStars = (rating: number) => (
+    <div className="rv-stars">
+      {Array.from({ length: 5 }).map((_, i) => (
+        <Star key={i} size={14} fill={i < rating ? '#facc15' : 'none'} color={i < rating ? '#facc15' : '#d1d5db'} />
+      ))}
+    </div>
+  );
 
   const renderClassification = (classification: string) => {
-    let dotColor = '#64748b';
-    let bg = '#f1f5f9';
-    let text = '#64748b';
-
-    if (classification === 'Ngắn hạn') {
-      dotColor = '#2563eb'; bg = '#dbeafe'; text = '#2563eb';
-    } else if (classification === 'Dài hạn') {
-      dotColor = '#7c3aed'; bg = '#ede9fe'; text = '#7c3aed';
-    } else if (classification === 'Cần xử lý') {
-      dotColor = '#b45309'; bg = '#fef3c7'; text = '#b45309';
-    } else if (classification === 'Chưa phân loại') {
-      dotColor = '#64748b'; bg = '#f1f5f9'; text = '#64748b';
-    }
-
+    let dotColor = '#64748b', bg = '#f1f5f9', text = '#64748b';
+    if (classification === 'Ngắn hạn')       { dotColor = '#2563eb'; bg = '#dbeafe'; text = '#2563eb'; }
+    else if (classification === 'Dài hạn')   { dotColor = '#7c3aed'; bg = '#ede9fe'; text = '#7c3aed'; }
+    else if (classification === 'Cần xử lý') { dotColor = '#b45309'; bg = '#fef3c7'; text = '#b45309'; }
     return (
       <span className="rv-badge" style={{ backgroundColor: bg, color: text }}>
-        <span className="rv-badge-dot" style={{ backgroundColor: dotColor }}></span>
+        <span className="rv-badge-dot" style={{ backgroundColor: dotColor }} />
         {classification}
       </span>
     );
   };
 
   const avatarColors = [
-    { bg: '#dbeafe', text: '#2563eb' },
-    { bg: '#fce7f3', text: '#be185d' },
-    { bg: '#d1fae5', text: '#059669' },
-    { bg: '#e0e7ff', text: '#4338ca' },
-    { bg: '#fee2e2', text: '#dc2626' },
-    { bg: '#fef3c7', text: '#b45309' },
-    { bg: '#ede9fe', text: '#7c3aed' },
-    { bg: '#ccfbf1', text: '#0d9488' },
-    { bg: '#ffedd5', text: '#c2410c' },
-    { bg: '#f1f5f9', text: '#475569' },
+    { bg: '#dbeafe', text: '#2563eb' }, { bg: '#fce7f3', text: '#be185d' },
+    { bg: '#d1fae5', text: '#059669' }, { bg: '#e0e7ff', text: '#4338ca' },
+    { bg: '#fee2e2', text: '#dc2626' }, { bg: '#fef3c7', text: '#b45309' },
+    { bg: '#ede9fe', text: '#7c3aed' }, { bg: '#ccfbf1', text: '#0d9488' },
+    { bg: '#ffedd5', text: '#c2410c' }, { bg: '#f1f5f9', text: '#475569' },
   ];
 
   const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
@@ -110,14 +162,17 @@ export const ReviewTable: React.FC<ReviewTableProps> = ({
         </thead>
         <tbody>
           {loading ? (
-            <tr>
-              <td colSpan={7} className="text-center py-4 text-muted">Đang tải dữ liệu...</td>
-            </tr>
+            <tr><td colSpan={7} className="text-center py-4 text-muted">Đang tải dữ liệu...</td></tr>
           ) : (
             reviews.map((review, idx) => {
               const color = avatarColors[idx % avatarColors.length];
               return (
-                <tr key={review.id} className="table-row-hover" style={{ cursor: 'pointer' }} onClick={() => navigate(`/admin/reviews/${review.id}`)}>
+                <tr
+                  key={review.id}
+                  className="table-row-hover"
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => navigate(`/admin/reviews/${review.id}`)}
+                >
                   <td data-label="Người dùng">
                     <div className="rv-user-cell">
                       <div className="rv-avatar" style={{ backgroundColor: color.bg, color: color.text }}>
@@ -135,7 +190,13 @@ export const ReviewTable: React.FC<ReviewTableProps> = ({
                   <td data-label="Đánh giá">{renderStars(review.rating)}</td>
                   <td data-label="Ngày gửi"><span className="rv-date">{review.date}</span></td>
                   <td data-label="Phân loại">{renderClassification(review.classification)}</td>
-                  <td data-label="Trạng thái">{renderBadge(review.status)}</td>
+                  <td data-label="Trạng thái">
+                    <StatusDropdown
+                      reviewId={review.id}
+                      current={review.status}
+                      onChange={handleStatusChange}
+                    />
+                  </td>
                 </tr>
               );
             })
@@ -149,45 +210,18 @@ export const ReviewTable: React.FC<ReviewTableProps> = ({
           Hiển thị <b>{totalItems === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1}-{Math.min(currentPage * itemsPerPage, totalItems)}</b> trong <b>{totalItems.toLocaleString()}</b> kết quả
         </span>
         <div className="pagination">
-          <button
-            className="page-nav"
-            disabled={currentPage === 1}
-            onClick={() => onPageChange(currentPage - 1)}
-          >
-            &lt;
-          </button>
-
+          <button className="page-nav" disabled={currentPage === 1} onClick={() => onPageChange(currentPage - 1)}>&lt;</button>
           {Array.from({ length: totalPages }).map((_, index) => {
-            const pageNumber = index + 1;
+            const p = index + 1;
             if (totalPages > 7) {
-              if (pageNumber === 1 || pageNumber === 2 || pageNumber === 3 || pageNumber === totalPages) {
-                return (
-                  <button
-                    key={pageNumber}
-                    className={`page-item ${currentPage === pageNumber ? 'active' : ''}`}
-                    onClick={() => onPageChange(pageNumber)}
-                  >{pageNumber}</button>
-                );
-              }
-              if (pageNumber === 4) return <span key={pageNumber} className="page-dots">...</span>;
+              if (p === 1 || p === 2 || p === 3 || p === totalPages)
+                return <button key={p} className={`page-item ${currentPage === p ? 'active' : ''}`} onClick={() => onPageChange(p)}>{p}</button>;
+              if (p === 4) return <span key={p} className="page-dots">...</span>;
               return null;
             }
-            return (
-              <button
-                key={pageNumber}
-                className={`page-item ${currentPage === pageNumber ? 'active' : ''}`}
-                onClick={() => onPageChange(pageNumber)}
-              >{pageNumber}</button>
-            );
+            return <button key={p} className={`page-item ${currentPage === p ? 'active' : ''}`} onClick={() => onPageChange(p)}>{p}</button>;
           })}
-
-          <button
-            className="page-nav"
-            disabled={currentPage === totalPages || totalItems === 0}
-            onClick={() => onPageChange(currentPage + 1)}
-          >
-            &gt;
-          </button>
+          <button className="page-nav" disabled={currentPage === totalPages || totalItems === 0} onClick={() => onPageChange(currentPage + 1)}>&gt;</button>
         </div>
       </div>
     </div>
