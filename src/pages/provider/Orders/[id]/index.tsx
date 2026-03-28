@@ -1,5 +1,4 @@
 import React from 'react';
-import ProviderLayout from '../../../../layouts/ProviderLayout/ProviderLayout';
 import Button from '../../../../components/UI/Button';
 import { Mail, Phone, User, CheckCircle, XCircle, Clock, Printer } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -12,7 +11,7 @@ const OrderDetailPage: React.FC = () => {
   const orderData = mockOrders.find(o => o.id === id) || mockOrders[0];
 
   return (
-    <ProviderLayout>
+    <>
       <div style={{ padding: '0 20px' }}>
         {/* Breadcrumb & Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '32px' }}>
@@ -176,7 +175,7 @@ const OrderDetailPage: React.FC = () => {
           </div>
         </div>
       </div>
-    </ProviderLayout>
+    </>
   );
 };
 

@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import ProviderLayout from '../../../layouts/ProviderLayout/ProviderLayout';
 import Button from '../../../components/UI/Button';
 import { ChevronRight, ChevronLeft, Bell } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -13,7 +12,7 @@ const OrdersPage: React.FC = () => {
   const tabs = ['Tất cả', `Chờ xác nhận (${pendingCount})`, 'Đang chuẩn bị'];
 
   return (
-    <ProviderLayout>
+    <>
       <div style={{ padding: '0 20px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
           <h2 style={{ fontSize: '24px', fontWeight: '800', color: '#1e293b' }}>Đơn đặt món (Nhà hàng)</h2>
@@ -123,7 +122,7 @@ const OrdersPage: React.FC = () => {
           </div>
         </div>
       </div>
-    </ProviderLayout>
+    </>
   );
 };
 

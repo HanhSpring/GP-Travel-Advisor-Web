@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import ProviderLayout from '../../../../layouts/ProviderLayout/ProviderLayout';
 import Input from '../../../../components/UI/Input';
 import Button from '../../../../components/UI/Button';
 import { Clock, MapPin, Upload, Wifi, Car, Wind, CreditCard, Search, Plus, Trash2, Edit2, ChevronLeft, ChevronRight, Star, Waves } from 'lucide-react';
@@ -420,7 +419,7 @@ const LocationEditPage: React.FC = () => {
   );
 
   return (
-    <ProviderLayout>
+    <>
       <div style={{ padding: '0 20px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '32px' }}>
           <div>
@@ -478,7 +477,7 @@ const LocationEditPage: React.FC = () => {
 
         {activeTab === 'Dịch vụ' ? renderServicesMenu() : activeTab === 'Đánh giá' ? renderReviews() : renderGeneralInfo()}
       </div>
-    </ProviderLayout>
+    </>
   );
 };
 

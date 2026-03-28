@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import ProviderLayout from '../../../layouts/ProviderLayout/ProviderLayout';
 import Button from '../../../components/UI/Button';
 import { Search, ChevronLeft, ChevronRight, Edit3, Trash2, Plus, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -12,7 +11,7 @@ const LocationsPage: React.FC = () => {
   const locations = mockLocations;
 
   return (
-    <ProviderLayout>
+    <>
       <div style={{ padding: '0 20px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
           <h2 style={{ fontSize: '28px', fontWeight: '800', color: '#000000', fontFamily: "'Times New Roman', Times, serif" }}>Danh sách địa điểm quản lý</h2>
@@ -150,7 +149,7 @@ const LocationsPage: React.FC = () => {
           </div>
         </div>
       </div>
-    </ProviderLayout>
+    </>
   );
 };
 
