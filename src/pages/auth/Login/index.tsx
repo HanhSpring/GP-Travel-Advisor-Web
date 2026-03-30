@@ -34,7 +34,6 @@ const LoginPage: React.FC = () => {
 
       // 3. Lấy dữ liệu BE trả về
       const { accessToken, user } = response.data;
-      console.log(response.data);
 
       // 4. Lưu Token và thông tin vào localStorage
       localStorage.setItem(tokenKey, accessToken);
