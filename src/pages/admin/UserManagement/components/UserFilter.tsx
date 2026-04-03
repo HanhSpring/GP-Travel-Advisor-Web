@@ -83,7 +83,7 @@ export const UserFilter: React.FC<UserFilterProps> = ({
         <option value="LOCKED">Đã khóa</option>
       </select>
 
-      {/* Lọc theo Trạng thái Xóa */}
+      {/* Lọc theo Trạng thái Xóa
       <select
         value={currentDeleteStatus}
         onChange={(e) => onDeleteStatusChange(e.target.value)}
@@ -91,18 +91,7 @@ export const UserFilter: React.FC<UserFilterProps> = ({
         <option value="">Tất cả trạng thái xóa</option>
         <option value="UNDELETED">Chưa xóa</option>
         <option value="DELETED">Đã xóa</option>
-      </select>
-      <button
-        style={{
-          padding: '8px 16px',
-          borderRadius: '8px',
-          border: '1px solid #e2e8f0',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-        }}>
-        <Download size={16} /> Xuất
-      </button>
+      </select> */}
     </div>
   );
 };
