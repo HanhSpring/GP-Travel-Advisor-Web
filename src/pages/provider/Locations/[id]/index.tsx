@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ProviderLayout from '../../../../layouts/ProviderLayout/ProviderLayout';
 import Input from '../../../../components/UI/Input';
 import Button from '../../../../components/UI/Button';
 import { Clock, MapPin, Upload, Wifi, Car, Wind, CreditCard, Search, Plus, Trash2, Edit2, ChevronLeft, ChevronRight, Star, Waves } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { mockLocations } from '../../../../mocks/locations';
+import { getPlaceDetail, getPlaceServicesByType } from '@/services/order.service';
 
 const LocationEditPage: React.FC = () => {
    const navigate = useNavigate();
@@ -12,12 +13,65 @@ const LocationEditPage: React.FC = () => {
    const [activeTab, setActiveTab] = useState('Thông tin chung');
    const [isActive, setIsActive] = useState(true);
    const [replyingToId, setReplyingToId] = useState<string | null>(null);
+   const [placeDetailData, setPlaceDetailData] = useState<any>(null);
+   const [loading, setLoading] = useState(true);
+   const [description, setDescription] = useState('');
+   const [freeServices, setFreeServices] = useState<any[]>([]);
+   const [paidServices, setPaidServices] = useState<any[]>([]);
+   const [servicesLoading, setServicesLoading] = useState(false);
 
-   // Get location data from mock
+   useEffect(() => {
+      const fetchPlaceDetail = async () => {
+         try {
+            if (id) {
+               const data = await getPlaceDetail(id);
+               setPlaceDetailData(data);
+               setDescription(data?.description || '');
+            }
+         } catch (error) {
+            console.error('Error fetching place detail:', error);
+         } finally {
+            setLoading(false);
+         }
+      };
+
+      fetchPlaceDetail();
+   }, [id]);
+
+   // Fetch services when Services tab is opened
+   useEffect(() => {
+      if (activeTab === 'Dịch vụ' && id) {
+         const fetchServices = async () => {
+            try {
+               setServicesLoading(true);
+               const data = await getPlaceServicesByType(id);
+               setFreeServices(data.freeServices || []);
+               setPaidServices(data.paidServices || []);
+            } catch (error) {
+               console.error('Error fetching services:', error);
+               setFreeServices([]);
+               setPaidServices([]);
+            } finally {
+               setServicesLoading(false);
+            }
+         };
+         fetchServices();
+      }
+   }, [activeTab, id]);
+
+   // Get location data from mock or API
    const loc = mockLocations.find(l => l.id === id) || mockLocations[0];
 
    const locationData = {
-      ...loc,
+      name: placeDetailData?.place_name || loc.name,
+      address: placeDetailData?.address || loc.address,
+      city: placeDetailData?.city || loc.city,
+      district: loc.district,
+      openTime: placeDetailData?.open_time?.slice(0, 5) || loc.openTime,
+      closeTime: placeDetailData?.close_time?.slice(0, 5) || loc.closeTime,
+      description: placeDetailData?.description || loc.description,
+      lat: placeDetailData?.latitude || loc.lat,
+      lng: placeDetailData?.longitude || loc.lng,
       gallery: loc.gallery.length > 0 ? loc.gallery : [
          'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=200&h=200&fit=crop',
          'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=200&h=200&fit=crop',
@@ -34,7 +88,7 @@ const LocationEditPage: React.FC = () => {
          return { ...s, icon: icons[s.iconName] || <Plus size={16} /> };
       }),
       reviews: {
-         average: 4.8,
+         average: placeDetailData?.rating || 4.8,
          total: 1250,
          distribution: [
             { score: 5, percentage: 75 },
@@ -74,7 +128,9 @@ const LocationEditPage: React.FC = () => {
                ]
             }
          ]
-      }
+      },
+      menu: loc.menu || [],
+      id: id
    };
 
    const renderGeneralInfo = () => (
@@ -82,11 +138,11 @@ const LocationEditPage: React.FC = () => {
          <div style={{ display: 'flex', gap: '48px' }}>
             {/* Left Column */}
             <div style={{ flex: 1.2 }}>
-               <Input label="Tên địa điểm" value={locationData.name} />
-               <Input label="Địa chỉ chi tiết" value={locationData.address} />
+               <Input label="Tên địa điểm" value={locationData.name} readOnly />
+               <Input label="Địa chỉ chi tiết" value={locationData.address} readOnly />
 
                <div style={{ display: 'flex', gap: '16px', marginBottom: '24px' }}>
-                  <div style={{ flex: 1 }}><Input label="Tỉnh/Thành phố" value={locationData.city} style={{ marginBottom: 0 }} /></div>
+                  <div style={{ flex: 1 }}><Input label="Tỉnh/Thành phố" value={locationData.city} readOnly style={{ marginBottom: 0 }} /></div>
                   <div style={{ flex: 1 }}>
                      <label style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text-primary)', display: 'block', marginBottom: '8px' }}>Quận/Huyện</label>
                      <select style={{ width: '100%', padding: '14px 16px', borderRadius: '12px', border: '1px solid #E2E8F0', background: '#fcfcfc', outline: 'none', fontSize: '15px' }}>
@@ -96,15 +152,17 @@ const LocationEditPage: React.FC = () => {
                </div>
 
                <div style={{ display: 'flex', gap: '16px', marginBottom: '24px' }}>
-                  <div style={{ flex: 1 }}><Input label="Giờ mở cửa" value={locationData.openTime} icon={<Clock size={16} />} style={{ marginBottom: 0 }} /></div>
-                  <div style={{ flex: 1 }}><Input label="Giờ đóng cửa" value={locationData.closeTime} icon={<Clock size={16} />} style={{ marginBottom: 0 }} /></div>
+                  <div style={{ flex: 1 }}><Input label="Giờ mở cửa" value={locationData.openTime} icon={<Clock size={16} />} readOnly style={{ marginBottom: 0 }} /></div>
+                  <div style={{ flex: 1 }}><Input label="Giờ đóng cửa" value={locationData.closeTime} icon={<Clock size={16} />} readOnly style={{ marginBottom: 0 }} /></div>
                </div>
 
                <div>
                   <label style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text-primary)', display: 'block', marginBottom: '8px' }}>Mô tả địa điểm</label>
                   <textarea
                      style={{ width: '100%', minHeight: '160px', padding: '16px', borderRadius: '12px', border: '1px solid #E2E8F0', background: '#fcfcfc', outline: 'none', fontSize: '15px', color: '#1e293b', lineHeight: '1.6', resize: 'vertical' }}
-                     defaultValue={locationData.description}
+                     value={description}
+                     onChange={(e) => setDescription(e.target.value)}
+                     placeholder="Nhập mô tả địa điểm..."
                   />
                </div>
             </div>
@@ -120,8 +178,8 @@ const LocationEditPage: React.FC = () => {
                </div>
 
                <div style={{ display: 'flex', gap: '16px', marginBottom: '32px' }}>
-                  <div style={{ flex: 1 }}><Input label="Kinh độ (Latitude)" value={locationData.lat} style={{ marginBottom: 0 }} /></div>
-                  <div style={{ flex: 1 }}><Input label="Vĩ độ (Longitude)" value={locationData.lng} style={{ marginBottom: 0 }} /></div>
+                  <div style={{ flex: 1 }}><Input label="Kinh độ (Latitude)" value={locationData.lat} readOnly style={{ marginBottom: 0 }} /></div>
+                  <div style={{ flex: 1 }}><Input label="Vĩ độ (Longitude)" value={locationData.lng} readOnly style={{ marginBottom: 0 }} /></div>
                </div>
 
                <div>
@@ -234,83 +292,78 @@ const LocationEditPage: React.FC = () => {
 
    const renderServicesMenu = () => (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
-         {/* TIỆN ÍCH MIỄN PHÍ */}
+
+         {/* TIỆN ÍCH MIỄN PHÍ — always rendered */}
          <div>
             <h5 style={{ fontSize: '18px', fontWeight: '800', color: '#000000', fontFamily: "'Times New Roman', Times, serif", marginBottom: '24px' }}>Tiện ích miễn phí</h5>
             <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-               {locationData.services.map(s => (
-                  <div key={s.id} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 24px', background: '#F8FAFC', border: '1px solid #F1F5F9', color: '#475569', borderRadius: '20px', fontSize: '14px', fontWeight: '600' }}>
-                     <span style={{ color: '#94a3b8' }}>{s.icon}</span> <span>{s.name}</span>
+               {freeServices.map(service => (
+                  <div key={service.id} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 24px', background: '#F0FDF4', border: '1px solid #BBEF63', color: '#166534', borderRadius: '20px', fontSize: '13px', fontWeight: '600' }}>
+                     <span>{service.name}</span>
                   </div>
                ))}
+               {/* Spinner shown inline — doesn't hide the add button */}
+               {servicesLoading && (
+                  <div style={{ display: 'flex', alignItems: 'center', padding: '12px 24px', color: '#94a3b8', fontSize: '13px' }}>
+                     Đang tải...
+                  </div>
+               )}
+               {/* Always visible */}
                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 24px', border: '1px solid #E2E8F0', borderStyle: 'dashed', color: '#94a3b8', borderRadius: '20px', fontSize: '14px', fontWeight: '600', cursor: 'pointer', background: 'transparent' }}>
                   <Plus size={16} /> <span>Thêm tiện ích</span>
                </div>
             </div>
          </div>
 
-         {/* DỊCH VỤ TÍNH PHÍ */}
+         {/* DỊCH VỤ TÍNH PHÍ — always rendered */}
          <div>
-            <h5 style={{ fontSize: '18px', fontWeight: '800', color: '#000000', fontFamily: "'Times New Roman', Times, serif", marginBottom: '24px' }}>Dịch vụ tính phí</h5>
+            <h5 style={{ fontSize: '18px', fontWeight: '800', color: '#000000', fontFamily: "'Times New Roman', Times, serif", marginBottom: '24px' }}>Dịch vụ tính phí ({paidServices.length})</h5>
             <div style={{ background: 'white', border: '1px solid #F1F5F9', borderRadius: '24px', overflow: 'hidden', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)' }}>
-               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                  <thead>
-                     <tr style={{ textAlign: 'left', background: '#FCFCFD', borderBottom: '1px solid #F1F5F9' }}>
-                        <th style={{ padding: '20px 32px', fontSize: '15px', fontWeight: '800', color: '#000000', fontFamily: "'Times New Roman', Times, serif" }}>Tên dịch vụ</th>
-                        <th style={{ padding: '20px 32px', fontSize: '15px', fontWeight: '800', color: '#000000', fontFamily: "'Times New Roman', Times, serif", textAlign: 'center' }}>Giá dịch vụ</th>
-                        <th style={{ padding: '20px 32px', fontSize: '15px', fontWeight: '800', color: '#000000', fontFamily: "'Times New Roman', Times, serif", textAlign: 'center' }}>Trạng thái</th>
-                        <th style={{ padding: '20px 32px', fontSize: '15px', fontWeight: '800', color: '#000000', fontFamily: "'Times New Roman', Times, serif", textAlign: 'center' }}>Thao tác</th>
-                     </tr>
-                  </thead>
-                  <tbody>
-                     {[
-                        { id: 1, name: 'Phòng VIP riêng tư', category: 'Dịch vụ phòng', price: '200.000 đ', active: true },
-                        { id: 2, name: 'Trang trí tiệc sinh nhật', category: 'Sự kiện', price: '500.000 đ', active: true },
-                        { id: 3, name: 'Karaoke tại phòng', category: 'Giải trí', price: '150.000 đ', active: false },
-                     ].map((item, idx, arr) => (
-                        <tr key={item.id} style={{ borderBottom: idx < arr.length - 1 ? '1px solid #F8FAFC' : 'none' }}>
-                           <td style={{ padding: '24px 32px', fontSize: '14px', fontWeight: '700', color: '#1e293b' }}>{item.name}</td>
-                           <td style={{ padding: '24px 32px', fontSize: '15px', fontWeight: '800', color: '#3b82f6', textAlign: 'center', textDecoration: 'underline' }}>{item.price}</td>
-                           <td style={{ padding: '24px 32px', textAlign: 'center' }}>
-                              <div style={{
-                                 width: '44px',
-                                 height: '24px',
-                                 background: item.active ? '#3b82f6' : '#E2E8F0',
-                                 borderRadius: '20px',
-                                 position: 'relative',
-                                 cursor: 'pointer',
-                                 display: 'inline-block',
-                                 verticalAlign: 'middle',
-                                 transition: '0.3s cubic-bezier(0.4, 0, 0.2, 1)'
-                              }}>
-                                 <div style={{
-                                    position: 'absolute',
-                                    right: item.active ? '4px' : 'auto',
-                                    left: item.active ? 'auto' : '4px',
-                                    top: '4px',
-                                    width: '16px',
-                                    height: '16px',
-                                    background: 'white',
-                                    borderRadius: '50%',
-                                    transition: '0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                                    boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-                                 }}></div>
-                              </div>
-                           </td>
-                           <td style={{ padding: '24px 32px', textAlign: 'center' }}>
-                              <div style={{ display: 'flex', gap: '16px', color: '#94a3b8', justifyContent: 'center' }}>
-                                 <Edit2 size={18} style={{ cursor: 'pointer' }} />
-                                 <Trash2 size={18} style={{ cursor: 'pointer' }} />
-                              </div>
-                           </td>
+               {servicesLoading ? (
+                  <div style={{ padding: '48px', textAlign: 'center', color: '#94a3b8', fontSize: '14px' }}>
+                     Đang tải dịch vụ...
+                  </div>
+               ) : paidServices.length > 0 ? (
+                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                     <thead>
+                        <tr style={{ textAlign: 'left', background: '#FCFCFD', borderBottom: '1px solid #F1F5F9' }}>
+                           <th style={{ padding: '20px 32px', fontSize: '15px', fontWeight: '800', color: '#000000', fontFamily: "'Times New Roman', Times, serif" }}>Tên dịch vụ</th>
+                           <th style={{ padding: '20px 32px', fontSize: '15px', fontWeight: '800', color: '#000000', fontFamily: "'Times New Roman', Times, serif", textAlign: 'center' }}>Giá dịch vụ</th>
+                           <th style={{ padding: '20px 32px', fontSize: '15px', fontWeight: '800', color: '#000000', fontFamily: "'Times New Roman', Times, serif", textAlign: 'center' }}>Trạng thái</th>
+                           <th style={{ padding: '20px 32px', fontSize: '15px', fontWeight: '800', color: '#000000', fontFamily: "'Times New Roman', Times, serif", textAlign: 'center' }}>Thao tác</th>
                         </tr>
-                     ))}
-                  </tbody>
-               </table>
+                     </thead>
+                     <tbody>
+                        {paidServices.map((service, idx) => (
+                           <tr key={service.id} style={{ borderBottom: idx < paidServices.length - 1 ? '1px solid #F8FAFC' : 'none' }}>
+                              <td style={{ padding: '24px 32px', fontSize: '14px', fontWeight: '700', color: '#1e293b' }}>{service.name}</td>
+                              <td style={{ padding: '24px 32px', fontSize: '15px', fontWeight: '800', color: '#d97706', textAlign: 'center' }}>
+                                 {typeof service.price === 'number' ? service.price.toLocaleString('vi-VN') : '0'}đ
+                              </td>
+                              <td style={{ padding: '24px 32px', textAlign: 'center' }}>
+                                 <div style={{ width: '44px', height: '24px', background: '#3b82f6', borderRadius: '20px', position: 'relative', cursor: 'pointer', display: 'inline-block', verticalAlign: 'middle' }}>
+                                    <div style={{ position: 'absolute', right: '4px', top: '4px', width: '16px', height: '16px', background: 'white', borderRadius: '50%', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}></div>
+                                 </div>
+                              </td>
+                              <td style={{ padding: '24px 32px', textAlign: 'center' }}>
+                                 <div style={{ display: 'flex', gap: '16px', color: '#94a3b8', justifyContent: 'center' }}>
+                                    <Edit2 size={18} style={{ cursor: 'pointer' }} />
+                                    <Trash2 size={18} style={{ cursor: 'pointer' }} />
+                                 </div>
+                              </td>
+                           </tr>
+                        ))}
+                     </tbody>
+                  </table>
+               ) : (
+                  /* Empty state with add button */
+                  <div style={{ padding: '48px', textAlign: 'center', color: '#94a3b8', fontSize: '14px' }}>
+                     Chưa có dịch vụ tính phí nào
+                  </div>
+               )}
             </div>
          </div>
 
-         {/* Optional Menu Section for Restaurants */}
          {locationData.type === 'Nhà hàng' && renderServiceSection('Quản lý thực đơn món ăn')}
       </div>
    );
