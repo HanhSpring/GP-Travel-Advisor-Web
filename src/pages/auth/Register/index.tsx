@@ -251,10 +251,10 @@ const RegisterPage: React.FC = () => {
             <GoogleIcon size={18} />
             Google
           </Button>
-          <Button variant="secondary" fullWidth style={{ fontWeight: '600', fontSize: '14px' }} type="button">
+          {/* <Button variant="secondary" fullWidth style={{ fontWeight: '600', fontSize: '14px' }} type="button">
             <FacebookIcon size={18} />
             Facebook
-          </Button>
+          </Button> */}
         </div>
 
         <div style={{ textAlign: 'center', fontSize: '14px', color: 'var(--text-secondary)', marginBottom: '40px' }}>
