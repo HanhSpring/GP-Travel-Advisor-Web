@@ -3,6 +3,7 @@ import { Location } from '../types/location';
 
 interface BackendBusinessPlaceItem {
   id: string;
+  image_url?: string | null;
   name: string;
   address: string;
   categories: string[];
@@ -20,6 +21,7 @@ interface BackendBusinessPlaceListResponse {
     total: number;
     pages: number;
   };
+  images: string[];
 }
 
 export interface BusinessLocationFilterParams {
@@ -42,7 +44,7 @@ const toUiStatus = (status: 'pending' | 'approved' | 'rejected'): Location['stat
 const mapLocation = (item: BackendBusinessPlaceItem): Location => {
   return {
     id: item.id,
-    image: `https://picsum.photos/seed/${item.id}/200/200`,
+    image: item.image_url || '',
     name: item.name,
     address: item.address,
     category: item.categories.join(', ') || 'Khác',

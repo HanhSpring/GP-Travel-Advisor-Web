@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Button from '../../../components/UI/Button';
 import { Search, ChevronLeft, ChevronRight, Edit3, Trash2, Plus, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import defaultLocationImage from '../../../assets/images/location-default.svg';
 
 import { businessLocationAPI } from '../../../services/businessLocationAPI';
 import type { Location } from '../../../types/location';
@@ -54,7 +55,7 @@ const LocationsPage: React.FC = () => {
           sort: state.sortOrder
         }, {
           page: currentPage,
-          limit: 12
+          limit: 10
         });
         
         setState(prev => ({
@@ -182,7 +183,15 @@ const LocationsPage: React.FC = () => {
                 >
                   <td style={{ padding: '20px 24px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                      <img src={loc.image} alt={loc.name} style={{ width: '48px', height: '48px', borderRadius: '12px', objectFit: 'cover' }} />
+                      <img
+                        src={loc.image || defaultLocationImage}
+                        alt={loc.name}
+                        style={{ width: '64px', height: '64px', borderRadius: '8px', objectFit: 'cover', flexShrink: 0 }}
+                        onError={(event) => {
+                          event.currentTarget.onerror = null;
+                          event.currentTarget.src = defaultLocationImage;
+                        }}
+                      />
                       <div>
                         <p style={{ fontSize: '15px', fontWeight: '800', color: '#1e293b' }}>{loc.name}</p>
                         <p style={{ fontSize: '12px', color: '#94a3b8' }}>{loc.address}</p>
@@ -224,7 +233,7 @@ const LocationsPage: React.FC = () => {
           </table>
           
           <div style={{ padding: '20px 24px', borderTop: '1px solid #F1F5F9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '13px', color: '#94a3b8' }}>Hiển thị {(currentPage-1)*12 + 1} - {Math.min(currentPage*12, state.totalItems)} của {state.totalItems} địa điểm</span>
+            <span style={{ fontSize: '13px', color: '#94a3b8' }}>Hiển thị {(currentPage-1)*10 + 1} - {Math.min(currentPage*10, state.totalItems)} của {state.totalItems} địa điểm</span>
             <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
               <button 
                 onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
@@ -234,7 +243,7 @@ const LocationsPage: React.FC = () => {
                 <ChevronLeft size={16} />
               </button>
               <div style={{ display: 'flex', gap: '4px' }}>
-                {Array.from({ length: Math.ceil(state.totalItems / 12) }, (_, i) => i + 1).map(page => (
+                {Array.from({ length: Math.ceil(state.totalItems / 10) }, (_, i) => i + 1).map(page => (
                   <button 
                     key={page}
                     onClick={() => setCurrentPage(page)}
@@ -255,9 +264,9 @@ const LocationsPage: React.FC = () => {
                 ))}
               </div>
               <button 
-                onClick={() => setCurrentPage(prev => Math.min(Math.ceil(state.totalItems / 12), prev + 1))}
-                disabled={currentPage >= Math.ceil(state.totalItems / 12)}
-                style={{ width: '32px', height: '32px', borderRadius: '8px', border: '1px solid #F1F5F9', background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', color: currentPage >= Math.ceil(state.totalItems / 12) ? '#E2E8F0' : '#64748b', cursor: currentPage >= Math.ceil(state.totalItems / 12) ? 'not-allowed' : 'pointer' }}
+                onClick={() => setCurrentPage(prev => Math.min(Math.ceil(state.totalItems / 10), prev + 1))}
+                disabled={currentPage >= Math.ceil(state.totalItems / 10)}
+                style={{ width: '32px', height: '32px', borderRadius: '8px', border: '1px solid #F1F5F9', background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', color: currentPage >= Math.ceil(state.totalItems / 10) ? '#E2E8F0' : '#64748b', cursor: currentPage >= Math.ceil(state.totalItems / 10) ? 'not-allowed' : 'pointer' }}
               >
                 <ChevronRight size={16} />
               </button>
