@@ -47,6 +47,8 @@ const SidebarItem: React.FC<SidebarItemProps> = ({ icon, label, to, badge }) => 
     )}
   </NavLink>
 );
+const defaultAvatar =
+  'https://media.istockphoto.com/id/1477583639/vector/user-profile-icon-vector-avatar-or-person-icon-profile-picture-portrait-symbol-vector.jpg?s=612x612&w=0&k=20&c=OWGIPPkZIWLPvnQS14ZSyHMoGtVTn1zS8cAgLy1Uh24=';
 
 const ProviderLayout: React.FC = () => {
   const navigate = useNavigate();
@@ -58,13 +60,13 @@ const ProviderLayout: React.FC = () => {
       const parsedUser = JSON.parse(storedUser);
       return {
         fullName: parsedUser.fullName || 'Đối tác',
-        avatar: parsedUser.avatar_url || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=80&h=80&fit=crop',
+        avatar: parsedUser.avatar_url || defaultAvatar,
       };
     }
 
     return {
       fullName: 'Đang tải...',
-      avatar: '',
+      avatar: defaultAvatar,
     };
   });
 
@@ -75,7 +77,7 @@ const ProviderLayout: React.FC = () => {
         const response = await apiClient.get('/business/profile/me');
         setHeaderInfo({
           fullName: response.data.fullName,
-          avatar: response.data.avatarUrl,
+          avatar: response.data.avatarUrl || defaultAvatar,
         });
       } catch (error) {
         console.error('Lỗi lấy dữ liệu Header:', error);
@@ -101,7 +103,7 @@ const ProviderLayout: React.FC = () => {
         setHeaderInfo((prev) => ({
           ...prev,
           fullName: parsedUser.fullName || prev.fullName,
-          avatar: parsedUser.avatarUrl || parsedUser.avatar_url || prev.avatar,
+          avatar: parsedUser.avatarUrl || parsedUser.avatar_url || defaultAvatar,
         }));
       }
     };

@@ -31,7 +31,8 @@ const ProfilePage: React.FC = () => {
     address: '',
     avatarUrl: '',
   });
-  const defaultAvatar = 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=240&h=240&fit=crop';
+  const defaultAvatar =
+    'https://media.istockphoto.com/id/1477583639/vector/user-profile-icon-vector-avatar-or-person-icon-profile-picture-portrait-symbol-vector.jpg?s=612x612&w=0&k=20&c=OWGIPPkZIWLPvnQS14ZSyHMoGtVTn1zS8cAgLy1Uh24=';
 
   // 2. Gọi API khi trang vừa render
   useEffect(() => {
@@ -39,8 +40,18 @@ const ProfilePage: React.FC = () => {
       try {
         // apiClient sẽ tự động gắn Token vào header
         const response = await apiClient.get('/business/profile/me');
-        // Đổ dữ liệu từ BE vào State
-        setProfileData(response.data);
+        const data = response.data;
+
+        // Làm sạch dữ liệu: Nếu giá trị là null hoặc undefined, ép thành chuỗi rỗng ''
+        setProfileData({
+          fullName: data.fullName || '',
+          email: data.email || '',
+          phone: data.phone || '',
+          identityCard: data.identityCard || '',
+          dob: data.dob || '',
+          address: data.address || '',
+          avatarUrl: data.avatarUrl || '',
+        });
       } catch (error) {
         console.error('Lỗi khi lấy thông tin hồ sơ:', error);
         Swal.fire({
