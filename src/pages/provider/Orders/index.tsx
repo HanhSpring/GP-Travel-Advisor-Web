@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { useOrders } from './hooks/useOrders';
 import Button from '../../../components/UI/Button';
 import ConfirmDialog from '../../../components/UI/ConfirmDialog';
 import { ChevronRight, ChevronLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { getOrdersByPlace, updateOrderStatus } from '@/services/order.service';
-import { Order } from '@/types/order.types';
 
 const userInfo = localStorage.getItem('userInfo');
 const parsedUser = userInfo ? JSON.parse(userInfo) : null;
@@ -16,11 +15,8 @@ const OrdersPage: React.FC = () => {
   const [restaurantFilter, setRestaurantFilter] = useState('all');
 
 
-  // --- State mới cho API ---
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [pendingConfirmId, setPendingConfirmId] = useState<string | null>(null);
+  const { orders, updateStatus } = useOrders(PLACE_ID);
 
   const handleViewDetail = (orderId: string) => {
     navigate(`/orders/${orderId}`);
@@ -31,30 +27,12 @@ const OrdersPage: React.FC = () => {
     const orderId = pendingConfirmId;
     setPendingConfirmId(null);
     try {
-      await updateOrderStatus(orderId, 'processing');
-      setOrders(prev => prev.map(o => o.order_id === orderId ? { ...o, status: 'processing' } : o));
+      await updateStatus({ orderId, status: 'processing' });
     } catch (err) {
       console.error('Không thể cập nhật trạng thái đơn:', err);
     }
   };
-  // --- Fetch data khi component mount ---
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const data = await getOrdersByPlace(PLACE_ID);
-        setOrders(data); // điều chỉnh nếu API trả về { orders: [...] }
-      } catch (err) {
-        setError('Không thể tải danh sách đơn hàng.');
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
 
-    fetchOrders();
-  }, []);
 
   const filteredOrders = orders.filter(order => {
     if (statusFilter !== 'all' && order.status !== statusFilter) return false;
