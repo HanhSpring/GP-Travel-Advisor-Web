@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import ProviderLayout from '../../../layouts/ProviderLayout/ProviderLayout';
+// import ProviderLayout from '../../../layouts/ProviderLayout/ProviderLayout';
 import { Building2, Utensils, BookOpen, Star, ArrowUpDown, ChevronUp, ChevronDown } from 'lucide-react';
 import { getDashboardStats, getFoodPerformance } from '@/services/order.service';
 
@@ -8,6 +8,7 @@ const parsedUser = userInfo ? JSON.parse(userInfo) : null;
 const VENDOR_ID = parsedUser?.businessId || parsedUser?.id || '';
 
 interface StatCardProps {
+  change?: { value: number; isPositive: boolean };
   icon: React.ReactNode;
   label: string;
   value: string | number;

@@ -7,7 +7,7 @@ import { twMerge } from 'tailwind-merge';
 // However, I'll stick to CSS classes or CSS modules if preferred.
 // For now, I'll use simple class merging.
 
-function cn(...inputs: ClassValue[]) {
+export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 

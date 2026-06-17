@@ -52,7 +52,7 @@ const AuthCallback: React.FC = () => {
 
         if (refreshData.session) {
           const newToken = refreshData.session.access_token;
-          const freshRole = refreshData.session.user.user_metadata?.role;
+          const = refreshData.session.user.user_metadata?.role;
 
           localStorage.setItem('access_token', newToken);
         } else {

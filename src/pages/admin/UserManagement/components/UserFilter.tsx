@@ -1,4 +1,4 @@
-import React, { memo, useState, useEffect } from 'react';
+import  { memo, useState, useEffect } from 'react';
 import { Search, Trash2 } from 'lucide-react';
 
 interface UserFilterProps {
@@ -7,10 +7,10 @@ interface UserFilterProps {
   onSearch: (term: string) => void;
   onRoleChange: (role: string) => void;
   onActiveStatusChange: (status: string) => void;
-  onDeleteStatusChange: (status: string) => void;
+  : (status: string) => void;
   currentRole: string;
   currentActiveStatus: string;
-  currentDeleteStatus: string;
+  : string;
 }
 
 export const UserFilter = memo<UserFilterProps>(function UserFilter({
@@ -19,10 +19,10 @@ export const UserFilter = memo<UserFilterProps>(function UserFilter({
   onSearch,
   onRoleChange,
   onActiveStatusChange,
-  onDeleteStatusChange,
+  
   currentRole,
   currentActiveStatus,
-  currentDeleteStatus,
+  
 }) {
   const [localSearch, setLocalSearch] = useState('');
 

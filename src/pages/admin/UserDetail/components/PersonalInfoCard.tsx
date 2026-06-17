@@ -4,11 +4,11 @@ import { User } from '../../../../types/user';
 
 interface PersonalInfoCardProps {
   user: User;
-  onUpdate: (updateData: Partial<User>) => Promise<void>;
-  isUpdating: boolean;
+  : (updateData: Partial<User>) => Promise<void>;
+  : boolean;
 }
 
-export const PersonalInfoCard: React.FC<PersonalInfoCardProps> = ({ user, onUpdate, isUpdating }) => {
+export const PersonalInfoCard: React.FC<PersonalInfoCardProps> = ({ user,  }) => {
   const displayDate = user.dateOfBirth
     ? new Date(user.dateOfBirth).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })
     : '';

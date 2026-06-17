@@ -1,18 +1,18 @@
 import React from 'react';
-import { Settings, Lock, Unlock } from 'lucide-react';
+import {  Lock, Unlock } from 'lucide-react';
 import { Badge } from '../../../../components/Badge';
 import { User } from '../../../../types/user';
 
 interface AccountSettingsCardProps {
   user: User;
-  onUpdate: (updateData: Partial<User>) => Promise<void>;
+  : (updateData: Partial<User>) => Promise<void>;
   onToggleStatus: (newStatus: 'ACTIVE' | 'LOCKED') => Promise<void>;
   isUpdating: boolean;
 }
 
 export const AccountSettingsCard: React.FC<AccountSettingsCardProps> = ({
   user,
-  onUpdate,
+  
   onToggleStatus,
   isUpdating,
 }) => {

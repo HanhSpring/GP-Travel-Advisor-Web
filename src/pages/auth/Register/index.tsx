@@ -31,7 +31,7 @@ const GoogleIcon = ({ size = 18 }: { size?: number }) => (
   </svg>
 );
 
-const FacebookIcon = ({ size = 18 }: { size?: number }) => (
+const = ({ size = 18 }: { size?: number }) => (
   <svg width={size} height={size} viewBox="0 0 24 24">
     <path
       fill="#1877F2"
@@ -241,7 +241,7 @@ const RegisterPage: React.FC = () => {
             Google
           </Button>
           {/* <Button variant="secondary" fullWidth style={{ fontWeight: '600', fontSize: '14px' }} type="button">
-            <FacebookIcon size={18} />
+            <size={18} />
             Facebook
           </Button> */}
         </div>

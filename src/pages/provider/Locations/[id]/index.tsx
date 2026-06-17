@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, {  useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Input from '../../../../components/UI/Input';
 import Button from '../../../../components/UI/Button';
@@ -6,18 +6,18 @@ import {
   Clock,
   MapPin,
   Upload,
-  Wifi,
-  Car,
-  Wind,
-  CreditCard,
+  
+  
+  
+  
   Plus,
   Trash2,
   Edit2,
   Star,
-  Waves,
+  
 } from 'lucide-react';
 
-import { TabKey, ReviewSort, ServiceKind, PlaceSummary, PlaceDraft, PlaceServiceItem, ReviewSummary, ServiceEditorState } from './types';
+import { TabKey,  ServiceKind,     ServiceEditorState } from './types';
 import { useLocationGeneral } from './hooks/useLocationGeneral';
 import { useLocationReviews } from './hooks/useLocationReviews';
 import { useLocationServices } from './hooks/useLocationServices';
@@ -53,7 +53,7 @@ const LocationEditPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<TabKey>('Thông tin chung');
 
   const { place, setPlace, draft, setDraft, loading, error, isActive, setIsActive, generalMessage, savedGeneralInfo } = useLocationGeneral(id, vendorId);
-  const { reviewRating, setReviewRating, reviewSort, setReviewSort, reviewHasImages, setReviewHasImages, reviewLoading, reviewError, replyingToId, setReplyingToId, locationData } = useLocationReviews(id, place?.id, vendorCandidates, activeTab);
+  const { reviewRating, setReviewRating, reviewSort, set reviewHasImages, setReviewHasImages, reviewLoading, reviewError, replyingToId, setReplyingToId, locationData } = useLocationReviews(id, place?.id, vendorCandidates, activeTab);
   const { freeServices, paidServices, menuItems, setMenuItems, servicesLoading, servicesError, serviceEditor, serviceDraft, setServiceDraft, openServiceEditor, closeServiceEditor, saveService, deleteService, togglePaidService } = useLocationServices(id, place?.id, activeTab);
 
   const pageTitle = draft.name || place?.name || 'Đang tải...';
@@ -413,7 +413,7 @@ const LocationEditPage: React.FC = () => {
           <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
             {freeServices.map((service) => (
               <div key={service.id} style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', padding: '14px 18px', background: '#F8FAFC', border: '1px solid #E2E8F0', color: '#334155', borderRadius: '20px', fontSize: '13px', fontWeight: '600', minWidth: '220px' }}>
-                <div style={{ marginTop: '2px', color: '#64748b' }}>{getServiceIcon(service.name)}</div>
+                <div style={{ marginTop: '2px', color: '#64748b' }}>{null}</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', flex: 1 }}>
                   <span>{service.name}</span>
                   {service.description && <span style={{ fontSize: '12px', color: '#64748b', fontWeight: '400' }}>{service.description}</span>}
@@ -513,7 +513,7 @@ const LocationEditPage: React.FC = () => {
                     <tr key={item.id} style={{ borderBottom: index < menuItems.length - 1 ? '1px solid #F8FAFC' : 'none' }}>
                       <td style={{ padding: '24px 32px', fontSize: '14px', fontWeight: '700', color: '#1e293b' }}>{item.name}</td>
                       <td style={{ padding: '24px 32px', fontSize: '14px', color: '#64748b' }}>{item.description || '—'}</td>
-                      <td style={{ padding: '24px 32px', fontSize: '15px', fontWeight: '800', color: '#3b82f6', textAlign: 'center' }}>{formatPrice(item.price)}</td>
+                      <td style={{ padding: '24px 32px', fontSize: '15px', fontWeight: '800', color: '#3b82f6', textAlign: 'center' }}>{`${item.price}`}</td>
                       <td style={{ padding: '24px 32px', textAlign: 'center' }}>
                         <div style={{ display: 'flex', gap: '16px', color: '#94a3b8', justifyContent: 'center' }}>
                           <Edit2 size={18} style={{ cursor: 'pointer' }} onClick={() => openServiceEditor('paid', item)} />

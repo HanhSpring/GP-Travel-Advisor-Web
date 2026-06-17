@@ -5,11 +5,11 @@ import { User } from '../../../../types/user';
 
 interface ProfileCardProps {
   user: User;
-  onUpdate: (updateData: Partial<User>) => Promise<void>;
-  isUpdating: boolean;
+  : (updateData: Partial<User>) => Promise<void>;
+  : boolean;
 }
 
-export const ProfileCard: React.FC<ProfileCardProps> = ({ user, onUpdate, isUpdating }) => {
+export const ProfileCard: React.FC<ProfileCardProps> = ({ user,  }) => {
   const formatRoleLabel = (role: string) => {
     switch (role) {
       case 'ADMIN':

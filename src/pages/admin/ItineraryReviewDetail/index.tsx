@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
-import { itineraryReviewAPI } from '../../../services/reviewAPI';
+import { itineraryReviewAPI } from '../../../services/itineraryReviewAPI';
 import { ItineraryReviewDetailInfo } from '../../../types/review';
 import { ItineraryReviewHeader } from './components/ItineraryReviewHeader';
 import { ItineraryReviewActions } from './components/ItineraryReviewActions';

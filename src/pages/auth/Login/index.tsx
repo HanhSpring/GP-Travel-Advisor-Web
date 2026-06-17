@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import AuthLayout from '../../../layouts/AuthLayout/AuthLayout';
 import Input from '../../../components/UI/Input';
 import Button from '../../../components/UI/Button';
-import { Mail, Lock, Eye, EyeOff, Linkedin, AlertCircle } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff,  AlertCircle } from 'lucide-react';
 import loginBg from '../../../assets/login-bg.png';
 import axios from 'axios';
 import { supabase } from '../../../utils/supabase';
@@ -261,7 +261,7 @@ const LoginPage: React.FC = () => {
             Google
           </Button>
           {/* <Button variant="secondary" fullWidth style={{ fontWeight: '600', fontSize: '14px' }} type="button">
-            <FacebookIcon size={18} />
+            <size={18} />
             Facebook
           </Button> */}
         </div>

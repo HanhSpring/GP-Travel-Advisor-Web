@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import  { memo } from 'react';
 import { User } from '../../../../types/user';
 import { Badge } from '../../../../components/Badge';
 import { Eye, Lock, Unlock } from 'lucide-react';

@@ -1,11 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Review, ReviewStatsInfo, ItineraryReview, ItineraryReviewStatsInfo } from '../../../types/review';
-import {
-  reviewAPI,
-  ReviewFilterParams,
-  itineraryReviewAPI,
-  ItineraryReviewFilterParams,
-} from '../../../services/reviewAPI';
+import { reviewAPI, ReviewFilterParams } from '../../../services/reviewAPI';
+import { itineraryReviewAPI, ItineraryReviewFilterParams } from '../../../services/itineraryReviewAPI';
 import { ReviewStats } from './components/ReviewStats';
 import { ReviewFilter } from './components/ReviewFilter';
 import { ReviewTable } from './components/ReviewTable';
