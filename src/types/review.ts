@@ -29,20 +29,16 @@ export interface ItineraryReviewStatsInfo {
 
 export interface ReviewDetailInfo {
   id: string;
-  // Thông tin người đánh giá
   userAvatar: string;
   userName: string;
   totalReviews: number;
   totalReports: number;
-  // Thông tin địa điểm
   locationName: string;
   locationAddress: string;
-  // Nội dung đánh giá
   rating: number;
   datetime: string;
   content: string;
   images: string[];
-  // Báo cáo vi phạm từ người dùng
   status?: 'Chờ duyệt' | 'Đã duyệt' | 'Vi phạm';
   classification: 'Ngắn hạn' | 'Dài hạn' | 'Cần xử lý' | 'Chưa phân loại';
   reportCount: number;

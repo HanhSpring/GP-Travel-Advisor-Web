@@ -6,7 +6,6 @@ import Button from '../../../components/UI/Button';
 import { Mail, AlertCircle, CheckCircle2, ArrowLeft } from 'lucide-react';
 import loginBg from '../../../assets/login-bg.png';
 
-// 1. Import apiClient thay vì axios thuần
 import apiClient from '../../../utils/apiClient';
 
 const ForgotPasswordPage: React.FC = () => {
@@ -21,7 +20,6 @@ const ForgotPasswordPage: React.FC = () => {
     setError(null);
     setSuccess(false);
 
-    // Bắt lỗi cơ bản ở FE trước khi gọi API
     if (!email) {
       setError('Email không được để trống');
       return;
@@ -30,19 +28,15 @@ const ForgotPasswordPage: React.FC = () => {
     try {
       setIsLoading(true);
 
-      // 2. Gọi API quên mật khẩu bằng apiClient
       const response = await apiClient.post('/auth/forgot-password', { email });
 
-      // 3. Hiển thị thông báo thành công thực tế từ Backend trả về
       setSuccess(true);
       setSuccessMessage(response.data.message || 'Đã gửi liên kết khôi phục! Vui lòng kiểm tra hộp thư của bạn.');
     } catch (err: any) {
       console.error('Lỗi khi gửi yêu cầu quên mật khẩu:', err);
 
-      // 4. Bắt chính xác câu chữ báo lỗi từ DTO của Backend (ví dụ: "Email không đúng định dạng")
       if (err.response?.data?.message) {
         const backendMsg = err.response.data.message;
-        // Xử lý trường hợp BE trả về mảng hoặc chuỗi
         setError(Array.isArray(backendMsg) ? backendMsg[0] : backendMsg);
       } else {
         setError('Có lỗi xảy ra khi gửi yêu cầu. Vui lòng thử lại sau!');
@@ -107,7 +101,7 @@ const ForgotPasswordPage: React.FC = () => {
         <Input
           label="Địa chỉ Email"
           placeholder="example@travel.com"
-          type="text" // Chuyển thành text để FE không tự chặn, nhường đất cho DTO Backend thể hiện
+          type="text"
           name="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}

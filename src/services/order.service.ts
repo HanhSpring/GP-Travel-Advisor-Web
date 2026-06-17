@@ -148,12 +148,10 @@ export const uploadPlaceImage = async (file: File) => {
   const formData = new FormData();
   formData.append('file', file);
   
-  // Gọi đến endpoint upload của bạn (giả định là /upload/place-image)
   const response = await apiClient.post('/upload/place-image', formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
   });
   
-  // Trả về URL từ server (Cloudflare/S3)
   return response.data.url || response.data; 
 };
 

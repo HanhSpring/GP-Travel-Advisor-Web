@@ -6,7 +6,7 @@ import { PersonalInfoCard } from './components/PersonalInfoCard';
 import { DetailFooter } from './components/DetailFooter';
 import { Lock, Unlock } from 'lucide-react';
 import { User } from '../../../types/user';
-import apiClient from '../../../utils/apiClient'; // Dùng apiClient thật của dự án
+import apiClient from '../../../utils/apiClient';
 import Swal from 'sweetalert2';
 import './UserDetail.css';
 
@@ -14,9 +14,8 @@ export const UserDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isUpdating, setIsUpdating] = useState(false); // Thêm state để khóa nút khi đang lưu
+  const [isUpdating, setIsUpdating] = useState(false);
 
-  // --- 1. API LẤY CHI TIẾT NGƯỜI DÙNG ---
   useEffect(() => {
     const fetchUserDetail = async () => {
       if (!id) return;
@@ -41,17 +40,13 @@ export const UserDetail: React.FC = () => {
     fetchUserDetail();
   }, [id]);
 
-  // --- 2. API CẬP NHẬT THÔNG TIN NGƯỜI DÙNG ---
-  // Hàm này sẽ được truyền xuống các Component con (Card) dưới dạng Props
   const handleUpdateUser = async (updateData: Partial<User>) => {
     if (!id) return;
 
     setIsUpdating(true);
     try {
-      // Gọi API PATCH lên Backend với dữ liệu mới
       await apiClient.patch(`/admin/users/${id}`, updateData);
 
-      // Cập nhật lại State ở Frontend ngay lập tức để giao diện không cần load lại trang
       setUser((prevUser) => {
         if (!prevUser) return null;
         return { ...prevUser, ...updateData };
@@ -66,7 +61,6 @@ export const UserDetail: React.FC = () => {
     } catch (error: any) {
       console.error('Lỗi khi cập nhật:', error);
 
-      // Hiển thị lỗi từ Backend (nếu có validation errors)
       const errorMessage = error.response?.data?.message || 'Có lỗi xảy ra khi lưu thông tin.';
       Swal.fire({
         title: 'Cập nhật thất bại',
@@ -90,7 +84,6 @@ export const UserDetail: React.FC = () => {
   const handleToggleStatus = async (newStatus: 'ACTIVE' | 'LOCKED') => {
     if (!id) return;
 
-    // Bật Pop-up xác nhận báo cáo đẹp (UI sweetalert2)
     const result = await Swal.fire({
       title: newStatus === 'LOCKED' ? 'Khóa tài khoản?' : 'Mở khóa tài khoản?',
       text:
@@ -109,10 +102,8 @@ export const UserDetail: React.FC = () => {
 
     setIsUpdating(true);
     try {
-      // Gọi đúng API endpoint trạng thái mà bạn đã tạo
       await apiClient.patch(`/admin/users/${id}/status`, { status: newStatus });
 
-      // Cập nhật State để giao diện tự render lại cục Badge và Nút
       setUser((prevUser) => {
         if (!prevUser) return null;
         return { ...prevUser, activeStatus: newStatus };

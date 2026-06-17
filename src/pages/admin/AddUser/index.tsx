@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Bell, Eye, EyeOff, Camera, ChevronDown } from 'lucide-react';
-import apiClient from '../../../utils/apiClient'; // Import thư viện gọi API
+import apiClient from '../../../utils/apiClient';
 import Swal from 'sweetalert2';
 import { AdminHeaderProfile } from '../../../components/AdminHeaderProfile';
 import './AddUser.css';
@@ -9,7 +9,7 @@ import './AddUser.css';
 export const AddUser: React.FC = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false); // State quản lý loading khi submit
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -17,7 +17,7 @@ export const AddUser: React.FC = () => {
     fullName: '',
     email: '',
     phone: '',
-    role: '', // Chú ý: Value select đang dùng Tiếng Việt, cần map sang Enum trước khi gửi
+    role: '',
     password: '',
     isActive: true,
     avatarUrl: '',
@@ -83,7 +83,6 @@ export const AddUser: React.FC = () => {
     setIsSubmitting(true);
 
     try {
-      // 1. Chuẩn bị dữ liệu (Map về đúng Enum Backend mong đợi)
       let mappedRole = '';
       if (formData.role === 'Admin') mappedRole = 'ADMIN';
       else if (formData.role === 'Nhà cung cấp') mappedRole = 'BUSINESS';
@@ -111,10 +110,8 @@ export const AddUser: React.FC = () => {
         avatarUrl: formData.avatarUrl,
       };
 
-      // 2. Gọi API POST để tạo người dùng
       await apiClient.post('/admin/users', payload);
 
-      // 3. Hiển thị thông báo và điều hướng về trang danh sách
       Swal.fire({
         icon: 'success',
         title: 'Thành công',
@@ -127,7 +124,6 @@ export const AddUser: React.FC = () => {
     } catch (error: any) {
       console.error('Lỗi khi thêm người dùng:', error);
 
-      // Xử lý hiển thị lỗi từ Backend (ví dụ: Email đã tồn tại)
       const errorMessage = error.response?.data?.message || 'Có lỗi xảy ra khi tạo người dùng.';
       Swal.fire({
         icon: 'error',

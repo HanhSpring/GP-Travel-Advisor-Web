@@ -51,7 +51,6 @@ const AddLocationPage: React.FC = () => {
     latitude: 10.77,
     longitude: 106.7,
     types: [] as string[],
-    // Tách openingHours thành 2 trường riêng biệt
     openTime: '08:00',
     closeTime: '22:00',
     description: '',
@@ -255,29 +254,24 @@ const AddLocationPage: React.FC = () => {
     try {
       setIsLoading(true);
 
-      // 1. Kiểm tra thông tin cơ bản
       if (!formData.name || !formData.address || formData.types.length === 0) {
         alert('Vui lòng điền đầy đủ thông tin tại Bước 1');
         setStep(1);
         return;
       }
 
-      // 2. Logic Upload ảnh (Học từ ProfilePage)
       const uploadedUrls: string[] = [];
       if (selectedImages.length > 0) {
-        // Dùng for...of để đảm bảo upload xong hết mới chạy tiếp
         for (const imgItem of selectedImages) {
           try {
             const url = await uploadPlaceImage(imgItem.file);
             uploadedUrls.push(url);
           } catch (uploadErr) {
             console.error("Lỗi upload 1 file:", uploadErr);
-            // Có thể chọn dừng lại hoặc tiếp tục tùy bạn
           }
         }
       }
 
-      // 3. Chuẩn bị Payload cho DB
       const categoryMap: { [key: string]: string } = {
         stay: 'Hotel',
         food: 'Restaurant',
@@ -293,8 +287,8 @@ const AddLocationPage: React.FC = () => {
         p_lng: formData.longitude,
         p_vendor_id: VENDOR_ID,
         p_categories: formData.types.map(t => categoryMap[t] || t),
-        p_open_time: formData.openTime, // Thêm trường này
-        p_close_time: formData.closeTime, // Thêm trường này
+        p_open_time: formData.openTime,
+        p_close_time: formData.closeTime,
         p_description: formData.description,
         p_services: formData.amenities.map(a => ({
           name: a.name,
@@ -305,10 +299,9 @@ const AddLocationPage: React.FC = () => {
           description: item.description || '',
           price: parseFloat(item.price) || 0
         })),
-        p_images: uploadedUrls // Mảng 5 URL ảnh đã upload lên cloud
+        p_images: uploadedUrls
       };
 
-      // 4. Gọi API lưu vào Supabase qua hàm create_full_place
       await addNewPlace(payload);
 
       alert('Tạo địa điểm và lưu ảnh thành công!');
@@ -403,7 +396,7 @@ const AddLocationPage: React.FC = () => {
               fontSize: '15px',
               color: '#1e293b',
               lineHeight: '1.6',
-              resize: 'vertical', // Cho phép user kéo giãn chiều cao
+              resize: 'vertical',
             }}
             value={formData.description}
             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
@@ -499,7 +492,7 @@ const AddLocationPage: React.FC = () => {
           <div style={{ flex: 1 }}>
             <Input
               label="Giờ mở cửa"
-              type="time" // Sử dụng type="time" để user chọn cho nhanh
+              type="time"
               value={formData.openTime}
               onChange={(e) => setFormData({ ...formData, openTime: e.target.value })}
               icon={<Clock size={18} />}
@@ -1088,7 +1081,6 @@ const AddLocationPage: React.FC = () => {
                 {/* Ở phần Footer Actions, tìm nút Hoàn tất và sửa lại như sau: */}
                 <Button
                   onClick={handleNext}
-                  // Bỏ điều kiện formData.menu.length === 0
                   disabled={isLoading}
                   style={{ padding: '12px 32px', borderRadius: '12px', gap: '8px' }}
                 >

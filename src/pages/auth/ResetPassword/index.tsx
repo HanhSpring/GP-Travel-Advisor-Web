@@ -6,13 +6,11 @@ import Button from '../../../components/UI/Button';
 import { Lock, Eye, EyeOff, AlertCircle, CheckCircle2 } from 'lucide-react';
 import loginBg from '../../../assets/login-bg.png';
 
-// Dùng apiClient thay vì axios thuần
 import apiClient from '../../../utils/apiClient';
 
 const ResetPasswordPage: React.FC = () => {
   const navigate = useNavigate();
 
-  // Khởi tạo state để chứa token lấy từ URL
   const [accessToken, setAccessToken] = useState<string | null>(null);
 
   const [showPassword, setShowPassword] = useState(false);
@@ -27,7 +25,6 @@ const ResetPasswordPage: React.FC = () => {
   const [success, setSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Lấy chính xác access_token từ URL băm (Hash) của Supabase trả về
   useEffect(() => {
     const hash = window.location.hash;
     if (hash) {
@@ -61,7 +58,6 @@ const ResetPasswordPage: React.FC = () => {
     try {
       setIsLoading(true);
 
-      // Gọi API thật xuống Backend bằng apiClient
       await apiClient.post('/auth/update-password', {
         accessToken: accessToken,
         newPassword: formData.password,
@@ -74,7 +70,6 @@ const ResetPasswordPage: React.FC = () => {
     } catch (err: any) {
       console.error('Lỗi khi đặt lại mật khẩu:', err);
 
-      // ĐÃ XÓA MOCK SUCCESS. Bắt lỗi thực tế từ Backend trả về
       if (err.response?.data?.message) {
         const backendMsg = err.response.data.message;
         setError(Array.isArray(backendMsg) ? backendMsg[0] : backendMsg);

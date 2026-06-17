@@ -30,7 +30,6 @@ export const UserManagement: React.FC = () => {
 
   const [refreshKey, setRefreshKey] = useState(0);
 
-  // Set<string> cho O(1) lookup trong UserTable thay vì O(n) Array.includes
   const selectedSet = useMemo(() => new Set(selectedRows), [selectedRows]);
 
   // --- HANDLERS ---
@@ -142,7 +141,6 @@ export const UserManagement: React.FC = () => {
     }
   }, [selectedRows]);
 
-  // Stats chỉ fetch lại khi có mutation (refreshKey), không phụ thuộc filter/page
   useEffect(() => {
     setStatsLoading(true);
     apiClient
@@ -152,7 +150,6 @@ export const UserManagement: React.FC = () => {
       .finally(() => setStatsLoading(false));
   }, [refreshKey]);
 
-  // User list fetch lại mỗi khi filter/page thay đổi
   useEffect(() => {
     setUsersLoading(true);
     apiClient

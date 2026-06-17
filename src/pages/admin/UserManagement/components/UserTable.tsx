@@ -4,7 +4,6 @@ import { Badge } from '../../../../components/Badge';
 import { Eye, Lock, Unlock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-// --- Utility functions hoisted ngoài component, không tạo lại mỗi render ---
 
 const DATE_FORMATTER = new Intl.DateTimeFormat('vi-VN', {
   day: '2-digit',
@@ -61,7 +60,6 @@ const getInitials = (name?: string, email?: string) => {
   return 'U';
 };
 
-// Windowed pagination: tối đa 7 nút, dùng '...' thay vì render tất cả
 const getPageNumbers = (current: number, total: number): (number | '...')[] => {
   if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
   if (current <= 4) return [1, 2, 3, 4, 5, '...', total];
@@ -98,7 +96,6 @@ export const UserTable = memo<UserTableProps>(function UserTable({
 }) {
   const navigate = useNavigate();
   const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
-  // Kiểm tra chính xác: tất cả user trên trang hiện tại có trong selectedSet không
   const allSelected = users.length > 0 && users.every((u) => selectedSet.has(u.id));
 
   return (

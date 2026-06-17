@@ -9,7 +9,6 @@ interface PersonalInfoCardProps {
 }
 
 export const PersonalInfoCard: React.FC<PersonalInfoCardProps> = ({ user, onUpdate, isUpdating }) => {
-  // Convert Ngày sinh (VD: 1990-01-01 -> 01/01/1990)
   const displayDate = user.dateOfBirth
     ? new Date(user.dateOfBirth).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })
     : '';

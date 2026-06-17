@@ -24,10 +24,10 @@ interface TopLocation {
   id: string;
   name: string;
   visitCount: number;
-  pending: number; // Đang lên lịch
-  ongoing: number; // Đang diễn ra
-  completed: number; // Hoàn thành
-  uncompleted: number; // Chưa hoàn thành
+  pending: number;
+  ongoing: number;
+  completed: number;
+  uncompleted: number;
 }
 
 interface ActivityPoint {
@@ -75,7 +75,6 @@ export const AdminDashboard: React.FC = () => {
   const [weekDropdownOpen, setWeekDropdownOpen] = useState<boolean>(false);
 
   // ---------------------------------------------------------
-  // LUỒNG 1: Tải các con số thống kê tổng
   // ---------------------------------------------------------
   useEffect(() => {
     const loadStats = async () => {
@@ -123,7 +122,6 @@ export const AdminDashboard: React.FC = () => {
   }, []);
 
   // ---------------------------------------------------------
-  // LUỒNG 2: Tải chart user hoạt động (Fix 1+5: useQuery với signal tự động cancel)
   // ---------------------------------------------------------
   const { data: activityData = [], isLoading: loadingChart } = useQuery({
     queryKey: ['dashboard-chart', selectedMonth, selectedWeek],
@@ -137,7 +135,6 @@ export const AdminDashboard: React.FC = () => {
   });
 
   // ---------------------------------------------------------
-  // LUỒNG 3: Tải chart danh sách địa điểm và trạng thái (Fix 2+5: useQuery + limit param)
   // ---------------------------------------------------------
   const { data: topLocations = [], isLoading: loadingLocs } = useQuery({
     queryKey: ['dashboard-popular-places'],
@@ -158,7 +155,6 @@ export const AdminDashboard: React.FC = () => {
   });
 
   // ---------------------------------------------------------
-  // LUỒNG 4: Tải dữ liệu tương tác người dùng
   // ---------------------------------------------------------
   const { data: interaction = { noInteraction: 0, createdTrip: 0, completedTrip: 0 }, isLoading: loadingInteraction } =
     useQuery<DashInteraction>({
@@ -172,7 +168,6 @@ export const AdminDashboard: React.FC = () => {
 
   const userChangePct = calcChangePct(stats.totalUsers, stats.newUsersMonth);
 
-  // Fix 3: Gộp sortedLocations, maxVisits, hasStatusData vào 1 useMemo
   const { sortedLocations, maxVisits, hasStatusData } = useMemo(() => {
     const sorted = [...topLocations].sort((a, b) =>
       locSortDesc ? b.visitCount - a.visitCount : a.visitCount - b.visitCount,

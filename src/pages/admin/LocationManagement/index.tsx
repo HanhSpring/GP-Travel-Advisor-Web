@@ -51,7 +51,6 @@ export const LocationManagement: React.FC = () => {
     }
   };
 
-  // Debounce search input 400ms trước khi gửi API
   useEffect(() => {
     const timer = setTimeout(() => {
       setCurrentPage(1);
@@ -60,7 +59,6 @@ export const LocationManagement: React.FC = () => {
     return () => clearTimeout(timer);
   }, [searchInput]);
 
-  // Fetch stats 1 lần khi mount, không phụ thuộc filter
   useEffect(() => {
     locationAPI.getLocationStats()
       .then(setStats)

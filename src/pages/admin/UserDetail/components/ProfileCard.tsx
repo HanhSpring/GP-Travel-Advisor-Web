@@ -10,7 +10,6 @@ interface ProfileCardProps {
 }
 
 export const ProfileCard: React.FC<ProfileCardProps> = ({ user, onUpdate, isUpdating }) => {
-  // Dịch mã Role từ Backend sang Tiếng Việt hiển thị
   const formatRoleLabel = (role: string) => {
     switch (role) {
       case 'ADMIN':
@@ -37,7 +36,6 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({ user, onUpdate, isUpda
     }
   };
 
-  // Logic lấy chữ cái đầu của Tên
   const getInitials = (name?: string) => {
     if (!name) return 'U';
     const parts = name.trim().split(' ');
@@ -45,7 +43,6 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({ user, onUpdate, isUpda
     return name.substring(0, 2).toUpperCase();
   };
 
-  // Hỗ trợ cả 2 chuẩn camelCase và snake_case
   const userAvatar = (user as any).avatarUrl || (user as any).avatar_url;
   const initials = getInitials(user.fullName);
 

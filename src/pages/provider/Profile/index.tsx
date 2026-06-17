@@ -21,7 +21,6 @@ const ProfilePage: React.FC = () => {
   const [showOldPassword, setShowOldPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
 
-  // 1. Khởi tạo State chứa dữ liệu người dùng
   const [profileData, setProfileData] = useState({
     fullName: '',
     email: '',
@@ -34,15 +33,12 @@ const ProfilePage: React.FC = () => {
   const defaultAvatar =
     'https://media.istockphoto.com/id/1477583639/vector/user-profile-icon-vector-avatar-or-person-icon-profile-picture-portrait-symbol-vector.jpg?s=612x612&w=0&k=20&c=OWGIPPkZIWLPvnQS14ZSyHMoGtVTn1zS8cAgLy1Uh24=';
 
-  // 2. Gọi API khi trang vừa render
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        // apiClient sẽ tự động gắn Token vào header
         const response = await apiClient.get('/business/profile/me');
         const data = response.data;
 
-        // Làm sạch dữ liệu: Nếu giá trị là null hoặc undefined, ép thành chuỗi rỗng ''
         setProfileData({
           fullName: data.fullName || '',
           email: data.email || '',
@@ -67,12 +63,10 @@ const ProfilePage: React.FC = () => {
     fetchProfile();
   }, []);
 
-  // Xử lý khi người dùng chọn file ảnh mới
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Tính năng Preview: Hiển thị ngay ảnh vừa chọn
     const previewUrl = URL.createObjectURL(file);
     setProfileData((prev) => ({ ...prev, avatarUrl: previewUrl }));
 
@@ -87,18 +81,15 @@ const ProfilePage: React.FC = () => {
         if (parsedUser.id) formData.append('userId', parsedUser.id);
       }
 
-      // Gửi FormData lên NestJS, trình duyệt tự sinh boundary multipart/form-data
       const response = await apiClient.post('/upload/avatar', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
 
-      // Nhận URL trả về và cập nhật lại Avatar (để đảm bảo lấy URL xịn từ Cloudflare)
       const newAvatarUrl = response.data.url || response.data;
       setProfileData((prev) => ({ ...prev, avatarUrl: newAvatarUrl }));
 
-      // Update localStorage (tuỳ chọn) để Header cũng được cập nhật ngay ảnh mới
       if (storedUser) {
         const parsedUser = JSON.parse(storedUser);
         parsedUser.avatarUrl = newAvatarUrl;
@@ -120,13 +111,11 @@ const ProfilePage: React.FC = () => {
         title: 'Lỗi',
         text: 'Có lỗi xảy ra khi tải ảnh lên. Khôi phục lại ảnh cũ.',
       });
-      // Nếu muốn bạn có thể khôi phục lại previewUrl về avatar mặc định ở đây
     } finally {
       setIsUploading(false);
     }
   };
 
-  // Hàm xử lý khi người dùng gõ vào ô Input
   const handleInputChange = (field: string, value: string) => {
     setProfileData((prev) => ({
       ...prev,
@@ -134,18 +123,16 @@ const ProfilePage: React.FC = () => {
     }));
   };
 
-  // Hiển thị màn hình chờ trong lúc gọi API
   if (isLoading) {
     return <div style={{ textAlign: 'center', padding: '50px' }}>Đang tải dữ liệu hồ sơ...</div>;
   }
 
   const handleSaveProfile = async () => {
     setIsSaving(true);
-    setFormErrors([]); // Xóa các lỗi cũ trên màn hình mỗi khi bắt đầu gửi request mới
+    setFormErrors([]);
 
     const localErrors: string[] = [];
 
-    // Kiểm tra khớp mật khẩu
     if (isPasswordChangeEnabled && (passwords.newPassword || passwords.confirmNewPassword)) {
       if (passwords.newPassword !== passwords.confirmNewPassword) {
         localErrors.push('Mật khẩu mới và Xác nhận mật khẩu không khớp!');
@@ -153,17 +140,14 @@ const ProfilePage: React.FC = () => {
       if (passwords.oldPassword && passwords.oldPassword === passwords.newPassword) {
         localErrors.push('Mật khẩu mới không được trùng với mật khẩu hiện tại!');
       }
-      // Bạn có thể thêm validation độ dài mật khẩu ở đây nếu muốn
       if (passwords.newPassword.length < 6) {
         localErrors.push('Mật khẩu mới phải có ít nhất 6 ký tự.');
       }
     }
 
-    // Nếu có lỗi ở Frontend thì dừng lại và hiển thị
     if (localErrors.length > 0) {
       setFormErrors(localErrors);
       setIsSaving(false);
-      // Scroll lên đầu trang để người dùng thấy lỗi
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
@@ -184,12 +168,10 @@ const ProfilePage: React.FC = () => {
 
       const response = await apiClient.patch('/business/profile/me', updatePayload);
 
-      // Xử lý lưu localStorage cho profile (giữ nguyên của bạn)
       const storedUser = localStorage.getItem('userInfo');
       if (storedUser) {
         const parsedUser = JSON.parse(storedUser);
         const updatedUser = { ...parsedUser, ...updatePayload };
-        // Xóa thuộc tính password trước khi lưu vào localStorage cho an toàn
         delete updatedUser.oldPassword;
         delete updatedUser.newPassword;
         localStorage.setItem('userInfo', JSON.stringify(updatedUser));

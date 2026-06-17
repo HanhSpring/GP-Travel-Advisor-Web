@@ -74,7 +74,6 @@ const ProviderLayout: React.FC = () => {
     };
   });
 
-  // Fetch số đơn pending để hiển thị badge
   useEffect(() => {
     const storedUser = localStorage.getItem('userInfo');
     const parsedUser = storedUser ? JSON.parse(storedUser) : null;
@@ -90,7 +89,6 @@ const ProviderLayout: React.FC = () => {
       .catch(() => {});
   }, []);
 
-  // 4. Gọi API lấy thông tin ngay khi Layout được load
   useEffect(() => {
     const fetchHeaderInfo = async () => {
       try {
@@ -115,7 +113,6 @@ const ProviderLayout: React.FC = () => {
 
     fetchHeaderInfo();
 
-    // 5. Lắng nghe sự kiện cập nhật profile để đổi Avatar/Tên ngay lập tức
     const handleUserUpdate = () => {
       const storedUser = localStorage.getItem('userInfo');
       if (storedUser) {
@@ -132,9 +129,7 @@ const ProviderLayout: React.FC = () => {
     return () => window.removeEventListener('userUpdated', handleUserUpdate);
   }, []);
 
-  // 5. Hàm xử lý Đăng xuất chuẩn xác
   const handleLogout = async () => {
-    // Gọi màn hình xác nhận thay thế cho confirm gốc của trình duyệt
     const result = await Swal.fire({
       title: 'Đăng xuất?',
       text: 'Bạn có chắc chắn muốn đăng xuất khỏi hệ thống?',
@@ -148,13 +143,10 @@ const ProviderLayout: React.FC = () => {
 
     if (!result.isConfirmed) return;
 
-    // 1. Clear dữ liệu LocalStorage (Tokens, User Info)
     authAPI.logout();
 
-    // (Tuỳ chọn) Gọi API Backend nếu Backend của bạn yêu cầu thu hồi token (Revoke Token)
     // await apiClient.post('/auth/logout');
 
-    // 2. Điều hướng người dùng về trang Login
     navigate('/login');
   };
 
@@ -226,7 +218,7 @@ const ProviderLayout: React.FC = () => {
         {/* Sidebar Footer */}
         <div style={{ marginTop: 'auto', padding: '0 8px' }}>
           <button
-            onClick={handleLogout} // Gắn hàm handleLogout vào đây
+            onClick={handleLogout}
             style={{
               width: '100%',
               background: 'transparent',

@@ -6,14 +6,14 @@ import { User } from '../../../../types/user';
 interface AccountSettingsCardProps {
   user: User;
   onUpdate: (updateData: Partial<User>) => Promise<void>;
-  onToggleStatus: (newStatus: 'ACTIVE' | 'LOCKED') => Promise<void>; // Khai báo
+  onToggleStatus: (newStatus: 'ACTIVE' | 'LOCKED') => Promise<void>;
   isUpdating: boolean;
 }
 
 export const AccountSettingsCard: React.FC<AccountSettingsCardProps> = ({
   user,
   onUpdate,
-  onToggleStatus, // Lấy ra dùng
+  onToggleStatus,
   isUpdating,
 }) => {
   const getStatusBadgeType = (status: string) => {
@@ -24,7 +24,6 @@ export const AccountSettingsCard: React.FC<AccountSettingsCardProps> = ({
     return status === 'ACTIVE' ? 'HOẠT ĐỘNG' : 'ĐÃ KHÓA';
   };
   const handleStatusClick = () => {
-    // Nếu đang Active thì ném lệnh Khóa, và ngược lại
     const targetStatus = user.activeStatus === 'ACTIVE' ? 'LOCKED' : 'ACTIVE';
     onToggleStatus(targetStatus);
   };

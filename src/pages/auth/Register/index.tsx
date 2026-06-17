@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom'; // 1. Import thêm useNavigate
+import { Link, useNavigate } from 'react-router-dom';
 import AuthLayout from '../../../layouts/AuthLayout/AuthLayout';
 import Input from '../../../components/UI/Input';
 import Button from '../../../components/UI/Button';
@@ -61,8 +61,8 @@ const handleGoogleLogin = async () => {
 };
 
 const RegisterPage: React.FC = () => {
-  const navigate = useNavigate(); // Khởi tạo hook điều hướng
-  const [isLoading, setIsLoading] = useState(false); // State để disable nút khi đang gọi API
+  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     fullName: '',
@@ -73,11 +73,9 @@ const RegisterPage: React.FC = () => {
     agree: false,
   });
 
-  // 3. Nâng cấp hàm handleSubmit
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // --- BƯỚC 1: VALIDATION CƠ BẢN Ở FRONTEND ---
     if (!formData.fullName || !formData.email || !formData.phone || !formData.password) {
       alert('Vui lòng điền đầy đủ các trường thông tin bắt buộc.');
       return;
@@ -93,32 +91,23 @@ const RegisterPage: React.FC = () => {
       return;
     }
 
-    // --- BƯỚC 2: CHUẨN BỊ PAYLOAD VÀ GỌI API ---
     setIsLoading(true);
     try {
-      // Map dữ liệu FE sang đúng định dạng mà DTO của BE yêu cầu
       const payload = {
         fullName: formData.fullName,
         phone: formData.phone,
         email: formData.email,
         password: formData.password,
-        agreeToTerms: formData.agree, // Đổi tên 'agree' thành 'agreeToTerms' cho khớp BE
+        agreeToTerms: formData.agree,
       };
 
-      // Gọi API xuống Backend (Giả định endpoint của BE là /auth/register/business)
       const response = await apiClient.post('/auth/register/business', payload);
 
-      // --- BƯỚC 3: XỬ LÝ KHI THÀNH CÔNG ---
-      // response.data.message sẽ chứa câu: "Đăng ký tài khoản đối tác thành công..." từ BE trả về
       alert(response.data.message || 'Đăng ký thành công!');
 
-      // Chuyển hướng người dùng về trang đăng nhập
       navigate('/login');
     } catch (error: any) {
-      // --- BƯỚC 4: XỬ LÝ KHI CÓ LỖI ---
-      // Nếu BE ném ra BadRequestException (lỗi 400), ta lấy message ra hiển thị
       if (error.response && error.response.data && error.response.data.message) {
-        // Có thể BE trả về mảng các lỗi validation, hoặc chuỗi
         const errorMsg = Array.isArray(error.response.data.message) ? error.response.data.message[0] : error.response.data.message;
         alert(`Lỗi đăng ký: ${errorMsg}`);
       } else {

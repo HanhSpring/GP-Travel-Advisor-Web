@@ -66,7 +66,6 @@ export const ReviewManagement: React.FC = () => {
     searchParams.get('tab') === 'itinerary' ? 'itinerary' : 'location',
   );
 
-  // ── Shared filter state (reset khi đổi tab)
   const [search, setSearch] = useState('');
   const [classification, setClassification] = useState('all');
   const [dateSent, setDateSent] = useState('all');
@@ -88,7 +87,6 @@ export const ReviewManagement: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const itemsPerPage = 10;
 
-  // Đồng bộ tab khi URL query param thay đổi (click sidebar)
   useEffect(() => {
     const tabFromUrl = searchParams.get('tab') === 'itinerary' ? 'itinerary' : 'location';
     setActiveTab(tabFromUrl);

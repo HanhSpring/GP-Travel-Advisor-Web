@@ -360,7 +360,6 @@ export const itineraryReviewAPI = {
       const response = await apiClient.get<BackendItineraryReviewDetailResponse>(`/admin/itinerary-reviews/${id}`);
       return mapItineraryReviewDetail(response.data);
     } catch {
-      // Mock data — dùng tạm khi backend chưa có endpoint GET /admin/itinerary-reviews/:id
       const mockSet: ItineraryReviewDetailInfo[] = [
         {
           id,
@@ -400,7 +399,6 @@ export const itineraryReviewAPI = {
           adminNote: '',
         },
       ];
-      // Dùng ký tự cuối của ID để luân phiên giữa 2 mock
       const idx = id.charCodeAt(id.length - 1) % 2;
       return mockSet[idx];
     }
