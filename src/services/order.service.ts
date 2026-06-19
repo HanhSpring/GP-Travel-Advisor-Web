@@ -120,9 +120,14 @@ export const addNewPlace = async (payload: {
   p_city: string;
   p_lat: number;
   p_lng: number;
+  p_vendor_id: string;
   p_categories: string[];
+  p_open_time?: string;
+  p_close_time?: string;
+  p_description?: string;
   p_services: Array<{ name: string; description: string }>;
   p_menu: Array<{ name: string; description: string; price: number }>;
+  p_images?: string[];
 }): Promise<any> => {
   try {
     const res = await apiClient.post('/business/add-new-place', payload);
@@ -144,17 +149,15 @@ export const updateOrderStatus = async (orderId: string, status: string): Promis
   return extractResponseData<any>(res as any);
 };
 
-export const uploadPlaceImage = async (file: File) => {
+export const uploadPlaceImage = async (file: File, placeId: string): Promise<string> => {
   const formData = new FormData();
-  formData.append('file', file);
-  
-  // Gọi đến endpoint upload của bạn (giả định là /upload/place-image)
-  const response = await apiClient.post('/upload/place-image', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  });
-  
-  // Trả về URL từ server (Cloudflare/S3)
-  return response.data.url || response.data; 
+  formData.append('files', file);
+  formData.append('placeId', placeId);
+
+  // Không set Content-Type thủ công — browser tự gắn boundary vào multipart/form-data
+  const response = await apiClient.post('/upload/place', formData);
+
+  return response.data.urls[0];
 };
 
 export const getPlaceServicesByType = async (placeId: string) => {

@@ -255,37 +255,21 @@ const AddLocationPage: React.FC = () => {
     try {
       setIsLoading(true);
 
-      // 1. Kiểm tra thông tin cơ bản
       if (!formData.name || !formData.address || formData.types.length === 0) {
         alert('Vui lòng điền đầy đủ thông tin tại Bước 1');
         setStep(1);
         return;
       }
 
-      // 2. Logic Upload ảnh (Học từ ProfilePage)
-      const uploadedUrls: string[] = [];
-      if (selectedImages.length > 0) {
-        // Dùng for...of để đảm bảo upload xong hết mới chạy tiếp
-        for (const imgItem of selectedImages) {
-          try {
-            const url = await uploadPlaceImage(imgItem.file);
-            uploadedUrls.push(url);
-          } catch (uploadErr) {
-            console.error("Lỗi upload 1 file:", uploadErr);
-            // Có thể chọn dừng lại hoặc tiếp tục tùy bạn
-          }
-        }
-      }
-
-      // 3. Chuẩn bị Payload cho DB
       const categoryMap: { [key: string]: string } = {
         stay: 'Hotel',
         food: 'Restaurant',
         tour: 'Tour',
-        trans: 'Transport'
+        trans: 'Transport',
       };
 
-      const payload = {
+      // Bước 1: Tạo địa điểm trước (không kèm ảnh)
+      const placeResult = await addNewPlace({
         p_name: formData.name,
         p_address: formData.address,
         p_city: formData.city,
@@ -293,23 +277,26 @@ const AddLocationPage: React.FC = () => {
         p_lng: formData.longitude,
         p_vendor_id: VENDOR_ID,
         p_categories: formData.types.map(t => categoryMap[t] || t),
-        p_open_time: formData.openTime, // Thêm trường này
-        p_close_time: formData.closeTime, // Thêm trường này
+        p_open_time: formData.openTime,
+        p_close_time: formData.closeTime,
         p_description: formData.description,
-        p_services: formData.amenities.map(a => ({
-          name: a.name,
-          description: a.description || ''
-        })),
-        p_menu: formData.menu.map(item => ({
-          name: item.name,
-          description: item.description || '',
-          price: parseFloat(item.price) || 0
-        })),
-        p_images: uploadedUrls // Mảng 5 URL ảnh đã upload lên cloud
-      };
+        p_services: formData.amenities.map(a => ({ name: a.name, description: a.description || '' })),
+        p_menu: formData.menu.map(item => ({ name: item.name, description: item.description || '', price: parseFloat(item.price) || 0 })),
+        p_images: [],
+      });
 
-      // 4. Gọi API lưu vào Supabase qua hàm create_full_place
-      await addNewPlace(payload);
+      const placeId = placeResult?.placeId || placeResult?.place_id || placeResult?.id;
+
+      // Bước 2: Upload từng ảnh lên R2 và lưu vào travel.place_images
+      if (selectedImages.length > 0 && placeId) {
+        for (const imgItem of selectedImages) {
+          try {
+            await uploadPlaceImage(imgItem.file, placeId);
+          } catch (uploadErr) {
+            console.error('Lỗi upload ảnh:', uploadErr);
+          }
+        }
+      }
 
       alert('Tạo địa điểm và lưu ảnh thành công!');
       navigate('/dashboard');
