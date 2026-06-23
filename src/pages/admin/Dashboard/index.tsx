@@ -87,8 +87,8 @@ export const AdminDashboard: React.FC = () => {
       const res = await apiClient.get('/admin/dashboard/stats');
       return res.data?.data ?? EMPTY_STATS;
     },
-    staleTime: 5 * 60 * 1000,   // dữ liệu "tươi" 5 phút — không refetch khi quay lại trang
-    gcTime: 30 * 60 * 1000,     // giữ cache 30 phút sau khi unmount
+    staleTime: 5 * 60 * 1000, // dữ liệu "tươi" 5 phút — không refetch khi quay lại trang
+    gcTime: 30 * 60 * 1000, // giữ cache 30 phút sau khi unmount
   });
 
   // ---------------------------------------------------------
@@ -103,7 +103,7 @@ export const AdminDashboard: React.FC = () => {
       return (res.data?.data ?? []) as ActivityPoint[];
     },
     staleTime: 30 * 60 * 1000,
-    gcTime: 60 * 60 * 1000,        // giữ cache 1 giờ sau unmount
+    gcTime: 60 * 60 * 1000, // giữ cache 1 giờ sau unmount
     placeholderData: keepPreviousData, // không flash loading khi đổi tháng/tuần
   });
 
@@ -128,7 +128,7 @@ export const AdminDashboard: React.FC = () => {
       })) as TopLocation[];
     },
     staleTime: 60 * 60 * 1000,
-    gcTime: 2 * 60 * 60 * 1000,   // giữ cache 2 giờ sau unmount
+    gcTime: 2 * 60 * 60 * 1000, // giữ cache 2 giờ sau unmount
   });
 
   // ---------------------------------------------------------
@@ -142,23 +142,18 @@ export const AdminDashboard: React.FC = () => {
         return res.data?.data ?? { noInteraction: 0, createdTrip: 0, completedTrip: 0 };
       },
       staleTime: 5 * 60 * 1000,
-      gcTime: 30 * 60 * 1000,     // giữ cache 30 phút sau unmount
+      gcTime: 30 * 60 * 1000, // giữ cache 30 phút sau unmount
     });
 
   const userChangePct = calcChangePct(stats.totalUsers, stats.newUsersMonth);
 
-  const weeksInSelectedMonth = useMemo(
-    () => getWeeksInMonth(selectedMonth, new Date().getFullYear()),
-    [selectedMonth],
-  );
+  const weeksInSelectedMonth = useMemo(() => getWeeksInMonth(selectedMonth, new Date().getFullYear()), [selectedMonth]);
 
   const { sortedLocations, maxVisits, hasStatusData } = useMemo(() => {
     return {
       sortedLocations: topLocations,
       maxVisits: topLocations[0]?.visitCount || 1,
-      hasStatusData: topLocations.some(
-        (l) => l.pending > 0 || l.ongoing > 0 || l.completed > 0 || l.uncompleted > 0,
-      ),
+      hasStatusData: topLocations.some((l) => l.pending > 0 || l.ongoing > 0 || l.completed > 0 || l.uncompleted > 0),
     };
   }, [topLocations]);
 
@@ -389,20 +384,26 @@ export const AdminDashboard: React.FC = () => {
           <div className="card">
             <div className="dash-card-header">
               <h3 className="dash-card-title">
-                {popularMode === 'top' ? 'Top 20 địa điểm được ghé thăm nhiều nhất' : 'Flop 20 địa điểm ít khách ghé thăm nhất'}
+                {popularMode === 'top' ? 'Top 20 địa điểm được ghé thăm nhiều nhất' : '20 địa điểm ít khách ghé thăm nhất'}
               </h3>
               <div className="dash-mode-toggle">
                 <button
                   className={`dash-toggle-btn ${popularMode === 'top' ? 'active' : ''}`}
-                  onClick={() => { setPopularMode('top'); setShowAllLocs(false); }}
+                  onClick={() => {
+                    setPopularMode('top');
+                    setShowAllLocs(false);
+                  }}
                   title="Top 20 địa điểm có nhiều du khách thực sự ghé thăm nhất (GPS check-in)">
-                  🔥 Top
+                  🔥 Nổi bật
                 </button>
                 <button
                   className={`dash-toggle-btn ${popularMode === 'flop' ? 'active' : ''}`}
-                  onClick={() => { setPopularMode('flop'); setShowAllLocs(false); }}
+                  onClick={() => {
+                    setPopularMode('flop');
+                    setShowAllLocs(false);
+                  }}
                   title="20 địa điểm có ít du khách thực sự ghé thăm nhất (GPS check-in)">
-                  ❄️ Flop
+                  ❄️ Ít khách
                 </button>
               </div>
             </div>
@@ -415,18 +416,11 @@ export const AdminDashboard: React.FC = () => {
               ) : (
                 <>
                   {sortedLocations.slice(0, showAllLocs ? 20 : 10).map((loc, idx) => (
-                    <Link
-                      key={loc.id}
-                      to={`/admin/locations/${loc.id}`}
-                      className="top-loc-row top-loc-row--link"
-                      title={loc.name}>
+                    <Link key={loc.id} to={`/admin/locations/${loc.id}`} className="top-loc-row top-loc-row--link" title={loc.name}>
                       <span className="top-loc-rank">{String(idx + 1).padStart(2, '0')}</span>
                       <span className="top-loc-name">{loc.name}</span>
                       <div className="top-loc-bar-track">
-                        <div
-                          className="top-loc-bar-fill"
-                          style={{ width: `${Math.round((loc.visitCount / maxVisits) * 100)}%` }}
-                        />
+                        <div className="top-loc-bar-fill" style={{ width: `${Math.round((loc.visitCount / maxVisits) * 100)}%` }} />
                       </div>
                       <span className="top-loc-count">{loc.visitCount.toLocaleString('vi-VN')} khách</span>
                     </Link>
@@ -444,7 +438,7 @@ export const AdminDashboard: React.FC = () => {
           {/* Stacked Status Bars */}
           <div className="card">
             <div className="dash-card-header">
-              <h3 className="dash-card-title">Trạng thái hành trình tại các điểm đến phổ biến</h3>
+              <h3 className="dash-card-title">Trạng thái hành trình tại các địa điểm phổ biến</h3>
             </div>
             <p className="trip-status-subtitle">Phân bố trạng thái lịch trình tại thời điểm du khách check-in thực tế</p>
 
