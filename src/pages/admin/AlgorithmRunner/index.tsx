@@ -6,6 +6,8 @@ import {
   algorithmPipelineAPI,
   formatPipelineDateTime,
 } from '../../../services/algorithmPipelineAPI';
+import { sessionCfTrainingAPI } from '../../../services/sessionCfTrainingAPI';
+import { algorithmTrainingAPI, ModelVersion } from '../../../services/algorithmTrainingAPI';
 import './AlgorithmRunner.css';
 
 const notify = (icon: 'success' | 'error' | 'info', title: string) => {
@@ -57,6 +59,7 @@ interface AlgoDropdownProps {
   statusDetail?: string;
   onSaveSchedule?: () => void;
   onRunNow: () => void;
+  runLabel?: string;
 }
 
 const AlgoDropdown: React.FC<AlgoDropdownProps> = ({
@@ -66,6 +69,7 @@ const AlgoDropdown: React.FC<AlgoDropdownProps> = ({
   runDay, onRunDayChange,
   runTime, onRunTimeChange,
   isRunning, scheduleSaving = false, scheduleDirty = false, lastRun, statusDetail, onSaveSchedule, onRunNow,
+  runLabel = 'Chạy ngay',
 }) => (
   <div className={`ar-dropdown${!available ? ' ar-dropdown--muted' : ''}`}>
     <div className="ar-dropdown__header">
@@ -213,7 +217,7 @@ const AlgoDropdown: React.FC<AlgoDropdownProps> = ({
               ) : (
                 <>
                   <Play size={14} />
-                  Chạy ngay
+                  {runLabel}
                 </>
               )}
             </button>
@@ -221,6 +225,82 @@ const AlgoDropdown: React.FC<AlgoDropdownProps> = ({
     </div>
   </div>
 );
+
+// ── ModelVersionsPanel ───────────────────────────────────────────────────────
+
+interface ModelVersionsPanelProps {
+  versions: ModelVersion[];
+  loading: boolean;
+  promotingVersionId: string | null;
+  onPromote: (versionId: string) => void;
+}
+
+const METRIC_COLUMNS: { key: string; label: string }[] = [
+  { key: 'recall_at_100', label: 'Recall@100' },
+  { key: 'hit_rate_at_100', label: 'HitRate@100' },
+  { key: 'map_at_100', label: 'MAP@100' },
+];
+
+const ModelVersionsPanel: React.FC<ModelVersionsPanelProps> = ({
+  versions, loading, promotingVersionId, onPromote,
+}) => {
+  if (!loading && versions.length === 0) {
+    return null;
+  }
+  return (
+    <div className="ar-versions">
+      <h3 className="ar-versions__title">Các phiên bản model đã train (Two-Tower)</h3>
+      {loading ? (
+        <p className="ar-versions__empty">Đang tải...</p>
+      ) : (
+        <div className="ar-versions__table-wrap">
+          <table className="ar-versions__table">
+            <thead>
+              <tr>
+                <th>Phiên bản</th>
+                <th>Trạng thái</th>
+                {METRIC_COLUMNS.map(col => <th key={col.key}>{col.label}</th>)}
+                <th>Train lúc</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {versions.map(v => (
+                <tr key={v.id}>
+                  <td className="ar-versions__tag">{v.versionTag.slice(0, 8)}</td>
+                  <td>
+                    <span className={`ar-versions__status ar-versions__status--${v.status}`}>
+                      {v.status}
+                    </span>
+                  </td>
+                  {METRIC_COLUMNS.map(col => (
+                    <td key={col.key}>
+                      {v.metrics && typeof v.metrics[col.key] === 'number'
+                        ? v.metrics[col.key].toFixed(4)
+                        : '—'}
+                    </td>
+                  ))}
+                  <td>{v.trainedAt ? formatPipelineDateTime(v.trainedAt) : '—'}</td>
+                  <td>
+                    <button
+                      className={`ar-btn-primary${v.status === 'active' || promotingVersionId === v.id ? ' ar-btn-primary--disabled' : ''}`}
+                      disabled={v.status === 'active' || promotingVersionId !== null}
+                      onClick={() => onPromote(v.id)}
+                    >
+                      {promotingVersionId === v.id ? (
+                        <Loader2 size={14} className="ar-spin" />
+                      ) : v.status === 'active' ? 'Đang hoạt động' : 'Kích hoạt'}
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+};
 
 // ── Page ─────────────────────────────────────────────────────────────────────
 
@@ -235,7 +315,7 @@ export const AlgorithmRunner: React.FC = () => {
   const [reviewScheduleDirty, setReviewScheduleDirty] = useState(false);
   const [reviewLastRun, setReviewLastRun] = useState<string | undefined>(undefined);
 
-  // ── Recommend pipeline ──
+  // ── Recommend pipeline (retrain hybrid recommender) ──
   const [recommendAutoEnabled, setRecommendAutoEnabled] = useState(false);
   const [recommendFrequency, setRecommendFrequency] = useState('daily');
   const [recommendRunDay, setRecommendRunDay] = useState('1');
@@ -254,6 +334,33 @@ export const AlgorithmRunner: React.FC = () => {
   const [scheduleFrequency, setScheduleFrequency] = useState('weekly');
   const [scheduleRunDay, setScheduleRunDay] = useState('1');
   const [scheduleRunTime, setScheduleRunTime] = useState('04:00');
+
+  // ── Session-CF training (Funk-SVD historical CF, docs/create-data) ──
+  const [sessionCfAutoEnabled, setSessionCfAutoEnabled] = useState(false);
+  const [sessionCfFrequency, setSessionCfFrequency] = useState('daily');
+  const [sessionCfRunDay, setSessionCfRunDay] = useState('1');
+  const [sessionCfRunTime, setSessionCfRunTime] = useState('02:00');
+  const [sessionCfRunning, setSessionCfRunning] = useState(false);
+  const [sessionCfScheduleSaving, setSessionCfScheduleSaving] = useState(false);
+  const [sessionCfScheduleDirty, setSessionCfScheduleDirty] = useState(false);
+  const [sessionCfLastRun, setSessionCfLastRun] = useState<string | undefined>(undefined);
+
+  // ── Two-Tower training (docs/trigger — Phase 0/1 + Modal) ──
+  const [twoTowerAutoEnabled, setTwoTowerAutoEnabled] = useState(false);
+  const [twoTowerFrequency, setTwoTowerFrequency] = useState('daily');
+  const [twoTowerRunDay, setTwoTowerRunDay] = useState('1');
+  const [twoTowerRunTime, setTwoTowerRunTime] = useState('01:00');
+  const [twoTowerRunning, setTwoTowerRunning] = useState(false);
+  const [twoTowerScheduleSaving, setTwoTowerScheduleSaving] = useState(false);
+  const [twoTowerScheduleDirty, setTwoTowerScheduleDirty] = useState(false);
+  const [twoTowerLastRun, setTwoTowerLastRun] = useState<string | undefined>(undefined);
+  const [twoTowerVersions, setTwoTowerVersions] = useState<ModelVersion[]>([]);
+  const [twoTowerVersionsLoading, setTwoTowerVersionsLoading] = useState(false);
+  const [promotingVersionId, setPromotingVersionId] = useState<string | null>(null);
+  const twoTowerObservedRunId = useRef<string | null>(null);
+  const twoTowerNotifiedRunIds = useRef(new Set<string>());
+
+  const [runResult, setRunResult] = useState<string | null>(null);
 
   useEffect(() => {
     let alive = true;
@@ -301,7 +408,48 @@ export const AlgorithmRunner: React.FC = () => {
       }
     }
 
+    async function loadSessionCfSchedule() {
+      try {
+        const schedule = await sessionCfTrainingAPI.getSchedule();
+        if (!alive) return;
+        setSessionCfAutoEnabled(schedule.autoEnabled);
+        setSessionCfFrequency(schedule.frequency);
+        setSessionCfRunDay(schedule.runDay);
+        setSessionCfRunTime(schedule.runTime);
+        setSessionCfScheduleDirty(false);
+        if (schedule.lastRunAt) {
+          setSessionCfLastRun(formatPipelineDateTime(schedule.lastRunAt));
+        }
+      } catch (err: unknown) {
+        if (!alive) return;
+        const message = err instanceof Error ? err.message : 'Không thể tải lịch chạy tự động';
+        setRunResult(`Lỗi: ${message}`);
+      }
+    }
+
+    async function loadTwoTowerSchedule() {
+      try {
+        const schedule = await algorithmTrainingAPI.getSchedule('two-tower');
+        if (!alive) return;
+        setTwoTowerAutoEnabled(schedule.autoEnabled);
+        setTwoTowerFrequency(schedule.frequency);
+        setTwoTowerRunDay(schedule.runDay);
+        setTwoTowerRunTime(schedule.runTime);
+        setTwoTowerScheduleDirty(false);
+        if (schedule.lastRunAt) {
+          setTwoTowerLastRun(formatPipelineDateTime(schedule.lastRunAt));
+        }
+      } catch (err: unknown) {
+        if (!alive) return;
+        const message = err instanceof Error ? err.message : 'Không thể tải lịch chạy tự động';
+        setRunResult(`Lỗi: ${message}`);
+      }
+    }
+
     void loadSchedules();
+    void loadSessionCfSchedule();
+    void loadTwoTowerSchedule();
+    void loadTwoTowerVersions();
     return () => {
       alive = false;
     };
@@ -348,6 +496,57 @@ export const AlgorithmRunner: React.FC = () => {
     const timer = window.setInterval(() => void syncRetrainStatus(), 3000);
     return () => window.clearInterval(timer);
   }, []);
+
+  useEffect(() => {
+    // Train Two-Tower chay tren GPU (Modal) mat ~30 phut, khong the doi tai cho -- job duoc gui
+    // bat dong bo (spawn) roi bao ve qua webhook. Poll training_runs de biet khi nao xong thay vi
+    // gia dinh xong ngay sau khi goi API run-full-training.
+    const syncTwoTowerStatus = async () => {
+      try {
+        const runs = await algorithmTrainingAPI.getRuns('two-tower', 5);
+        const run = runs.find(r => r.runType === 'training');
+        if (!run) return;
+
+        const isActive = run.status === 'pending' || run.status === 'running';
+        setTwoTowerRunning(isActive);
+
+        if (isActive) {
+          twoTowerObservedRunId.current = run.id;
+          return;
+        }
+
+        if (run.completedAt) {
+          setTwoTowerLastRun(formatPipelineDateTime(run.completedAt));
+        }
+        if (twoTowerObservedRunId.current === run.id && !twoTowerNotifiedRunIds.current.has(run.id)) {
+          twoTowerNotifiedRunIds.current.add(run.id);
+          if (run.status === 'completed') {
+            notify('success', 'Two-Tower train xong — có phiên bản model mới đang chờ duyệt.');
+            void loadTwoTowerVersions();
+          } else if (run.status === 'failed') {
+            notify('error', run.errorMessage ?? 'Two-Tower train thất bại');
+          }
+        }
+      } catch {
+        // Giu polling; loi tam thoi khong nen lam mat trang thai dang chay tren UI.
+      }
+    };
+    void syncTwoTowerStatus();
+    const timer = window.setInterval(() => void syncTwoTowerStatus(), 5000);
+    return () => window.clearInterval(timer);
+  }, []);
+
+  const loadTwoTowerVersions = async () => {
+    setTwoTowerVersionsLoading(true);
+    try {
+      const versions = await algorithmTrainingAPI.getVersions('two-tower');
+      setTwoTowerVersions(versions);
+    } catch {
+      // Im lang -- co the chua chay migration/chua co version nao, khong lam gian doan trang UI.
+    } finally {
+      setTwoTowerVersionsLoading(false);
+    }
+  };
 
   const saveRecommendSchedule = async () => {
     setRecommendScheduleSaving(true);
@@ -461,6 +660,185 @@ export const AlgorithmRunner: React.FC = () => {
     }
   };
 
+  const saveSessionCfSchedule = async () => {
+    setSessionCfScheduleSaving(true);
+    try {
+      const schedule = await sessionCfTrainingAPI.updateSchedule({
+        autoEnabled: sessionCfAutoEnabled,
+        frequency: sessionCfFrequency as 'daily' | 'weekly' | 'monthly',
+        runTime: sessionCfRunTime,
+        runDay: Number(sessionCfRunDay),
+      });
+      setSessionCfAutoEnabled(schedule.autoEnabled);
+      setSessionCfFrequency(schedule.frequency);
+      setSessionCfRunDay(schedule.runDay);
+      setSessionCfRunTime(schedule.runTime);
+      setSessionCfScheduleDirty(false);
+      if (schedule.lastRunAt) {
+        setSessionCfLastRun(formatPipelineDateTime(schedule.lastRunAt));
+      }
+      setRunResult('Đã lưu lịch chạy tự động huấn luyện Session-CF.');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Không thể lưu lịch chạy tự động';
+      setRunResult(`Lỗi: ${message}`);
+    } finally {
+      setSessionCfScheduleSaving(false);
+    }
+  };
+
+  const handleSessionCfAutoChange = (next: boolean) => {
+    setSessionCfAutoEnabled(next);
+    setSessionCfScheduleDirty(true);
+  };
+
+  const handleSessionCfFrequencyChange = (next: string) => {
+    const frequency = next as 'daily' | 'weekly' | 'monthly';
+    const nextDay =
+      frequency === 'weekly'
+        ? ['0', '1', '2', '3', '4', '5', '6'].includes(sessionCfRunDay)
+          ? sessionCfRunDay
+          : '1'
+        : frequency === 'monthly'
+          ? String(Math.min(Math.max(Number(sessionCfRunDay) || 1, 1), 28))
+          : sessionCfRunDay;
+    setSessionCfFrequency(frequency);
+    setSessionCfRunDay(nextDay);
+    setSessionCfScheduleDirty(true);
+  };
+
+  const handleSessionCfRunTimeChange = (next: string) => {
+    setSessionCfRunTime(next);
+    setSessionCfScheduleDirty(true);
+  };
+
+  const handleSessionCfRunDayChange = (next: string) => {
+    setSessionCfRunDay(next);
+    setSessionCfScheduleDirty(true);
+  };
+
+  const handleRunSessionCfTraining = async () => {
+    setSessionCfRunning(true);
+    setRunResult(null);
+    try {
+      const result = await sessionCfTrainingAPI.runTraining({ dry_run: false, upload_r2: true });
+      setSessionCfLastRun(formatPipelineDateTime(result.completed_at));
+      const metricsText = Object.entries(result.metrics)
+        .map(([k, v]) => `${k}=${v.toFixed(4)}`)
+        .join(', ');
+      setRunResult(
+        `Hoàn thành: train lại với ${result.n_users} user, ${result.n_items} place ` +
+        `(model=${result.model_type}${metricsText ? `, ${metricsText}` : ''}). ` +
+        `${result.uploaded_r2 ? 'Đã upload R2 và nạp lại model đang chạy.' : 'Chưa upload R2.'}`
+      );
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Lỗi không xác định';
+      setRunResult(`Lỗi: ${message}`);
+    } finally {
+      setSessionCfRunning(false);
+    }
+  };
+
+  const saveTwoTowerSchedule = async () => {
+    setTwoTowerScheduleSaving(true);
+    try {
+      const schedule = await algorithmTrainingAPI.updateSchedule('two-tower', {
+        autoEnabled: twoTowerAutoEnabled,
+        frequency: twoTowerFrequency as 'daily' | 'weekly' | 'monthly',
+        runTime: twoTowerRunTime,
+        runDay: Number(twoTowerRunDay),
+      });
+      setTwoTowerAutoEnabled(schedule.autoEnabled);
+      setTwoTowerFrequency(schedule.frequency);
+      setTwoTowerRunDay(schedule.runDay);
+      setTwoTowerRunTime(schedule.runTime);
+      setTwoTowerScheduleDirty(false);
+      if (schedule.lastRunAt) {
+        setTwoTowerLastRun(formatPipelineDateTime(schedule.lastRunAt));
+      }
+      setRunResult(
+        'Đã lưu lịch tự động cho Two-Tower — hệ thống sẽ tự chuẩn bị dữ liệu theo lịch, ' +
+        'và chỉ tự train khi có dữ liệu mới thật sự (đồng thời đã đủ thời gian tối thiểu kể từ lần train gần nhất).'
+      );
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Không thể lưu lịch chạy tự động';
+      setRunResult(`Lỗi: ${message}`);
+    } finally {
+      setTwoTowerScheduleSaving(false);
+    }
+  };
+
+  const handleTwoTowerAutoChange = (next: boolean) => {
+    setTwoTowerAutoEnabled(next);
+    setTwoTowerScheduleDirty(true);
+  };
+
+  const handleTwoTowerFrequencyChange = (next: string) => {
+    const frequency = next as 'daily' | 'weekly' | 'monthly';
+    const nextDay =
+      frequency === 'weekly'
+        ? ['0', '1', '2', '3', '4', '5', '6'].includes(twoTowerRunDay)
+          ? twoTowerRunDay
+          : '1'
+        : frequency === 'monthly'
+          ? String(Math.min(Math.max(Number(twoTowerRunDay) || 1, 1), 28))
+          : twoTowerRunDay;
+    setTwoTowerFrequency(frequency);
+    setTwoTowerRunDay(nextDay);
+    setTwoTowerScheduleDirty(true);
+  };
+
+  const handleTwoTowerRunTimeChange = (next: string) => {
+    setTwoTowerRunTime(next);
+    setTwoTowerScheduleDirty(true);
+  };
+
+  const handleTwoTowerRunDayChange = (next: string) => {
+    setTwoTowerRunDay(next);
+    setTwoTowerScheduleDirty(true);
+  };
+
+  const handleRunTwoTowerTraining = async () => {
+    setTwoTowerRunning(true);
+    setRunResult(null);
+    try {
+      const dataset = await algorithmTrainingAPI.prepareDataset('two-tower');
+      const training = await algorithmTrainingAPI.runFullTraining('two-tower', {
+        trainingDatasetId: dataset.trainingDatasetId,
+      });
+      const datasetNote = dataset.skipped
+        ? `Không có dữ liệu mới nên dùng lại dataset đã chuẩn bị trước đó ` +
+          `(${dataset.rowCounts.interactions ?? 0} tương tác, ${dataset.rowCounts.users ?? 0} user).`
+        : `Đã chuẩn bị dữ liệu (${dataset.rowCounts.interactions ?? 0} tương tác, ` +
+          `${dataset.rowCounts.users ?? 0} user).`;
+      setRunResult(
+        `${datasetNote} Đã gửi job train lên Modal ` +
+        `(trạng thái: ${training.status}). Train chạy trên GPU khoảng 30 phút — bạn có thể rời trang, ` +
+        `hệ thống sẽ tự thông báo khi xong và phiên bản mới sẽ xuất hiện trong bảng "Các phiên bản model".`
+      );
+      // Khong flip running=false o day -- job vua submit van dang chay tren Modal (~30 phut).
+      // Effect syncTwoTowerStatus() se polling va tu cap nhat running/thong bao khi run thuc su xong.
+    } catch (err: unknown) {
+      setTwoTowerRunning(false);
+      const message = err instanceof Error ? err.message : 'Lỗi không xác định';
+      setRunResult(`Lỗi: ${message}`);
+    }
+  };
+
+  const handlePromoteVersion = async (versionId: string) => {
+    setPromotingVersionId(versionId);
+    setRunResult(null);
+    try {
+      await algorithmTrainingAPI.promoteVersion('two-tower', versionId);
+      setRunResult('Đã kích hoạt phiên bản model mới — ai-service đã hot-reload, không gián đoạn.');
+      await loadTwoTowerVersions();
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Lỗi không xác định';
+      setRunResult(`Lỗi: ${message}`);
+    } finally {
+      setPromotingVersionId(null);
+    }
+  };
+
   return (
     <div className="page-container ar-page">
       <header className="page-header">
@@ -479,6 +857,16 @@ export const AlgorithmRunner: React.FC = () => {
       </header>
 
       <div className="ar-content">
+        {runResult && (
+          <div
+            className={`ar-banner${runResult.startsWith('Lỗi') ? ' ar-banner--error' : ' ar-banner--success'}`}
+            role="alert"
+          >
+            <span>{runResult}</span>
+            <button className="ar-banner__close" onClick={() => setRunResult(null)}>×</button>
+          </div>
+        )}
+
         <div className="ar-accordion">
           <AlgoDropdown
             title="Thuật toán gợi ý"
@@ -500,6 +888,32 @@ export const AlgorithmRunner: React.FC = () => {
             onRunNow={handleRunRecommendPipeline}
           />
           <AlgoDropdown
+            title="Thuật toán gợi ý (Two-Tower)"
+            available={true}
+            autoEnabled={twoTowerAutoEnabled}
+            onAutoChange={handleTwoTowerAutoChange}
+            frequency={twoTowerFrequency}
+            onFrequencyChange={handleTwoTowerFrequencyChange}
+            runDay={twoTowerRunDay}
+            onRunDayChange={handleTwoTowerRunDayChange}
+            runTime={twoTowerRunTime}
+            onRunTimeChange={handleTwoTowerRunTimeChange}
+            isRunning={twoTowerRunning}
+            scheduleSaving={twoTowerScheduleSaving}
+            scheduleDirty={twoTowerScheduleDirty}
+            lastRun={twoTowerLastRun}
+            statusDetail={twoTowerRunning ? 'Đang train trên GPU (khoảng 30 phút)...' : undefined}
+            onSaveSchedule={saveTwoTowerSchedule}
+            onRunNow={handleRunTwoTowerTraining}
+            runLabel="Train lại"
+          />
+          <ModelVersionsPanel
+            versions={twoTowerVersions}
+            loading={twoTowerVersionsLoading}
+            promotingVersionId={promotingVersionId}
+            onPromote={handlePromoteVersion}
+          />
+          <AlgoDropdown
             title="Lọc đánh giá"
             available={true}
             autoEnabled={reviewAutoEnabled}
@@ -516,6 +930,24 @@ export const AlgorithmRunner: React.FC = () => {
             lastRun={reviewLastRun}
             onSaveSchedule={saveReviewSchedule}
             onRunNow={handleRunReviewPipeline}
+          />
+          <AlgoDropdown
+            title="Huấn luyện gợi ý cá nhân hoá (Session-CF)"
+            available={true}
+            autoEnabled={sessionCfAutoEnabled}
+            onAutoChange={handleSessionCfAutoChange}
+            frequency={sessionCfFrequency}
+            onFrequencyChange={handleSessionCfFrequencyChange}
+            runDay={sessionCfRunDay}
+            onRunDayChange={handleSessionCfRunDayChange}
+            runTime={sessionCfRunTime}
+            onRunTimeChange={handleSessionCfRunTimeChange}
+            isRunning={sessionCfRunning}
+            scheduleSaving={sessionCfScheduleSaving}
+            scheduleDirty={sessionCfScheduleDirty}
+            lastRun={sessionCfLastRun}
+            onSaveSchedule={saveSessionCfSchedule}
+            onRunNow={handleRunSessionCfTraining}
           />
           <AlgoDropdown
             title="Lập lịch"

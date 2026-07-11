@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 import { Bell, TrendingUp, TrendingDown, AlertTriangle, ChevronDown, RefreshCw } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import apiClient from '../../../utils/apiClient';
@@ -422,14 +422,41 @@ export const AdminDashboard: React.FC = () => {
               </div>
             ) : (
               <>
-                <div className="interaction-list">
-                  <InteractionBar label="Chưa tương tác" pct={interaction.noInteraction} color="#ef4444" />
-                  <InteractionBar label="Đã tạo lịch trình" pct={interaction.createdTrip} color="#f59e0b" />
-                  <InteractionBar label="Đã đi theo lịch trình" pct={interaction.completedTrip} color="#3b82f6" />
-                </div>
-
-                {interaction.noInteraction === 0 && interaction.createdTrip === 0 && interaction.completedTrip === 0 && (
-                  <p className="interaction-note">Chưa có dữ liệu tương tác.</p>
+                {interaction.noInteraction === 0 && interaction.createdTrip === 0 && interaction.completedTrip === 0 ? (
+                  <p className="interaction-note" style={{ marginTop: '20px', textAlign: 'center', color: '#6b7280' }}>Chưa có dữ liệu tương tác.</p>
+                ) : (
+                  <ResponsiveContainer width="100%" height={220}>
+                    <PieChart>
+                      <Pie
+                        data={[
+                          { name: 'Chưa tương tác', value: interaction.noInteraction, color: '#ef4444' },
+                          { name: 'Đã tạo lịch trình', value: interaction.createdTrip, color: '#f59e0b' },
+                          { name: 'Đã đi theo lịch trình', value: interaction.completedTrip, color: '#3b82f6' }
+                        ].filter(item => item.value > 0)}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={60}
+                        outerRadius={80}
+                        paddingAngle={2}
+                        dataKey="value"
+                        stroke="none"
+                        label={({ value }) => `${value}%`}
+                      >
+                        {[
+                          { name: 'Chưa tương tác', value: interaction.noInteraction, color: '#ef4444' },
+                          { name: 'Đã tạo lịch trình', value: interaction.createdTrip, color: '#f59e0b' },
+                          { name: 'Đã đi theo lịch trình', value: interaction.completedTrip, color: '#3b82f6' }
+                        ].filter(item => item.value > 0).map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip 
+                        formatter={(value: any) => [`${value}%`, 'Tỷ lệ']}
+                        contentStyle={{ borderRadius: '8px', border: '1px solid #e5e7eb', fontSize: '13px' }}
+                      />
+                      <Legend iconType="circle" wrapperStyle={{ fontSize: '12px' }} />
+                    </PieChart>
+                  </ResponsiveContainer>
                 )}
               </>
             )}
@@ -585,13 +612,13 @@ const StatCard: React.FC<StatCardProps> = ({ label, value, changePct, loading })
     <div className="dash-stat-card">
       <div className="stat-card-top">
         <span className="stat-label">{label}</span>
-        {!loading && changePct !== 0 && (
+        {/* {!loading && changePct !== 0 && (
           <span className={`stat-badge ${isPos ? 'badge-up' : 'badge-down'}`}>
             {isPos ? <TrendingUp size={11} /> : <TrendingDown size={11} />}
             {isPos ? '+' : '-'}
             {abs}%
           </span>
-        )}
+        )} */}
       </div>
       <span className="stat-value">{value}</span>
     </div>
