@@ -8,6 +8,7 @@ import { ReviewContent } from './components/ReviewContent';
 import { ReportSection } from './components/ReportSection';
 import { ReviewActions } from './components/ReviewActions';
 import './ReviewDetail.css';
+import Swal from 'sweetalert2';
 
 export const ReviewDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -50,7 +51,7 @@ export const ReviewDetail: React.FC = () => {
       });
     } catch (error) {
       console.error('Failed to update review classification', error);
-      window.alert('Không thể cập nhật phân loại đánh giá. Vui lòng thử lại.');
+      Swal.fire({ text: 'Không thể cập nhật phân loại đánh giá. Vui lòng thử lại.', icon: 'error' });
       throw error;
     }
   };
@@ -60,7 +61,7 @@ export const ReviewDetail: React.FC = () => {
     if (!review) return;
     if (!id) return;
     if (!newStatus || newStatus === 'Chờ duyệt' || newStatus === 'Đã ẩn') {
-      window.alert('Không thể chuyển trạng thái về Chờ duyệt.');
+      Swal.fire({ text: 'Không thể chuyển trạng thái về Chờ duyệt.', icon: 'error' });
       return;
     }
 
@@ -74,7 +75,7 @@ export const ReviewDetail: React.FC = () => {
       setReview({ ...review, status: newStatus });
     } catch (error) {
       console.error('Failed to update review status', error);
-      window.alert('Không thể cập nhật trạng thái đánh giá. Vui lòng thử lại.');
+      Swal.fire({ text: 'Không thể cập nhật trạng thái đánh giá. Vui lòng thử lại.', icon: 'error' });
     }
   };
 

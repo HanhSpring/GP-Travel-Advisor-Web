@@ -9,6 +9,7 @@ import { ReviewContent } from '../ReviewDetail/components/ReviewContent';
 import { ReportSection } from '../ReviewDetail/components/ReportSection';
 import '../ReviewDetail/ReviewDetail.css';
 import './ItineraryReviewDetail.css';
+import Swal from 'sweetalert2';
 
 export const ItineraryReviewDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -39,7 +40,7 @@ export const ItineraryReviewDetail: React.FC = () => {
   const handleUpdateStatus = async (newStatus: ItineraryReviewDetailInfo['status']) => {
     if (!review || !id) return;
     if (!newStatus || newStatus === 'Chờ duyệt' || newStatus === 'Đã ẩn') {
-      window.alert('Không thể chuyển trạng thái về Chờ duyệt.');
+      Swal.fire({ text: 'Không thể chuyển trạng thái về Chờ duyệt.', icon: 'error' });
       return;
     }
 
@@ -53,7 +54,7 @@ export const ItineraryReviewDetail: React.FC = () => {
       setReview({ ...review, status: newStatus });
     } catch (error) {
       console.error('Failed to update itinerary review status', error);
-      window.alert('Không thể cập nhật trạng thái đánh giá. Vui lòng thử lại.');
+      Swal.fire({ text: 'Không thể cập nhật trạng thái đánh giá. Vui lòng thử lại.', icon: 'error' });
     }
   };
 
