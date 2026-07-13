@@ -235,12 +235,6 @@ interface ModelVersionsPanelProps {
   onPromote: (versionId: string) => void;
 }
 
-const METRIC_COLUMNS: { key: string; label: string }[] = [
-  { key: 'recall_at_100', label: 'Recall@100' },
-  { key: 'hit_rate_at_100', label: 'HitRate@100' },
-  { key: 'map_at_100', label: 'MAP@100' },
-];
-
 const ModelVersionsPanel: React.FC<ModelVersionsPanelProps> = ({
   versions, loading, promotingVersionId, onPromote,
 }) => {
@@ -259,7 +253,6 @@ const ModelVersionsPanel: React.FC<ModelVersionsPanelProps> = ({
               <tr>
                 <th>Phiên bản</th>
                 <th>Trạng thái</th>
-                {METRIC_COLUMNS.map(col => <th key={col.key}>{col.label}</th>)}
                 <th>Train lúc</th>
                 <th></th>
               </tr>
@@ -273,13 +266,6 @@ const ModelVersionsPanel: React.FC<ModelVersionsPanelProps> = ({
                       {v.status}
                     </span>
                   </td>
-                  {METRIC_COLUMNS.map(col => (
-                    <td key={col.key}>
-                      {v.metrics && typeof v.metrics[col.key] === 'number'
-                        ? v.metrics[col.key].toFixed(4)
-                        : '—'}
-                    </td>
-                  ))}
                   <td>{v.trainedAt ? formatPipelineDateTime(v.trainedAt) : '—'}</td>
                   <td>
                     <button
