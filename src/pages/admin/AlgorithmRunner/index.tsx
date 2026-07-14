@@ -804,7 +804,7 @@ export const AlgorithmRunner: React.FC = () => {
             onRunNow={handleRunReviewPipeline}
           />
           <AlgoDropdown
-            title="Huấn luyện gợi ý cá nhân hoá (Session-CF)"
+            title="Cập nhật mô hình tương tác người dùng"
             available={true}
             autoEnabled={sessionCfAutoEnabled}
             onAutoChange={handleSessionCfAutoChange}
