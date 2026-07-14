@@ -295,7 +295,7 @@ export const AdminDashboard: React.FC = () => {
           {/* Area Chart */}
           <div className="card dash-chart-main">
             <div className="dash-card-header">
-              <h3 className="dash-card-title">Người dùng hoạt động theo thời gian</h3>
+              <h3 className="dash-card-title">Người dùng mới đăng ký theo thời gian</h3>
               <div className="dash-period-toggle" style={{ display: 'flex', gap: '8px' }}>
                 <div className="dash-month-dropdown-wrapper" style={{ position: 'relative' }}>
                   <button
@@ -367,7 +367,7 @@ export const AdminDashboard: React.FC = () => {
             {loadingChart ? (
               <div className="dash-empty-chart">Đang tải dữ liệu biểu đồ...</div>
             ) : activityData.length === 0 ? (
-              <div className="dash-empty-chart">Chưa có dữ liệu hoạt động</div>
+              <div className="dash-empty-chart">Chưa có dữ liệu đăng ký</div>
             ) : (
               <ResponsiveContainer width="100%" height={210}>
                 <AreaChart data={activityData} margin={{ top: 8, right: 8, left: -30, bottom: 0 }}>
@@ -393,7 +393,7 @@ export const AdminDashboard: React.FC = () => {
                       fontSize: 12,
                       boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
                     }}
-                    formatter={(v) => [`${Number(v ?? 0).toLocaleString('vi-VN')} người`, 'Đang hoạt động']}
+                    formatter={(v) => [`${Number(v ?? 0).toLocaleString('vi-VN')} người`, 'Đăng ký mới']}
                     labelStyle={{ fontWeight: 600, marginBottom: 4 }}
                   />
                   <Area
@@ -423,7 +423,9 @@ export const AdminDashboard: React.FC = () => {
             ) : (
               <>
                 {interaction.noInteraction === 0 && interaction.createdTrip === 0 && interaction.completedTrip === 0 ? (
-                  <p className="interaction-note" style={{ marginTop: '20px', textAlign: 'center', color: '#6b7280' }}>Chưa có dữ liệu tương tác.</p>
+                  <p className="interaction-note" style={{ marginTop: '20px', textAlign: 'center', color: '#6b7280' }}>
+                    Chưa có dữ liệu tương tác.
+                  </p>
                 ) : (
                   <ResponsiveContainer width="100%" height={220}>
                     <PieChart>
@@ -431,8 +433,8 @@ export const AdminDashboard: React.FC = () => {
                         data={[
                           { name: 'Chưa tương tác', value: interaction.noInteraction, color: '#ef4444' },
                           { name: 'Đã tạo lịch trình', value: interaction.createdTrip, color: '#f59e0b' },
-                          { name: 'Đã đi theo lịch trình', value: interaction.completedTrip, color: '#3b82f6' }
-                        ].filter(item => item.value > 0)}
+                          { name: 'Đã đi theo lịch trình', value: interaction.completedTrip, color: '#3b82f6' },
+                        ].filter((item) => item.value > 0)}
                         cx="50%"
                         cy="50%"
                         innerRadius={60}
@@ -440,17 +442,18 @@ export const AdminDashboard: React.FC = () => {
                         paddingAngle={2}
                         dataKey="value"
                         stroke="none"
-                        label={({ value }) => `${value}%`}
-                      >
+                        label={({ value }) => `${value}%`}>
                         {[
                           { name: 'Chưa tương tác', value: interaction.noInteraction, color: '#ef4444' },
                           { name: 'Đã tạo lịch trình', value: interaction.createdTrip, color: '#f59e0b' },
-                          { name: 'Đã đi theo lịch trình', value: interaction.completedTrip, color: '#3b82f6' }
-                        ].filter(item => item.value > 0).map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
-                        ))}
+                          { name: 'Đã đi theo lịch trình', value: interaction.completedTrip, color: '#3b82f6' },
+                        ]
+                          .filter((item) => item.value > 0)
+                          .map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color} />
+                          ))}
                       </Pie>
-                      <Tooltip 
+                      <Tooltip
                         formatter={(value: any) => [`${value}%`, 'Tỷ lệ']}
                         contentStyle={{ borderRadius: '8px', border: '1px solid #e5e7eb', fontSize: '13px' }}
                       />
