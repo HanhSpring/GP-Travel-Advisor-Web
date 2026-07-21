@@ -20,6 +20,28 @@ const notify = (icon: 'success' | 'error' | 'info', title: string) => {
   });
 };
 
+const RECOMMENDER_STATUS_LABELS: Record<string, string> = {
+  queued: 'Đang chờ',
+  pending: 'Đang chờ',
+  starting: 'Đang khởi động',
+  running: 'Đang chạy',
+  exporting_data: 'Đang xuất dữ liệu',
+  building_embeddings: 'Đang tạo dữ liệu biểu diễn',
+  building_cb_lookup: 'Đang tạo bảng tra cứu nội dung',
+  training_rating_cf: 'Đang huấn luyện từ đánh giá',
+  training_log_cf: 'Đang huấn luyện từ lịch sử tương tác',
+  quality_gate: 'Đang kiểm tra chất lượng',
+  deploying_artifacts: 'Đang triển khai mô hình',
+  completed: 'Hoàn thành',
+  failed: 'Thất bại',
+  cancelled: 'Đã hủy',
+};
+
+const formatRecommenderStatus = (status?: string | null): string => {
+  if (!status) return 'Chưa ghi nhận';
+  return RECOMMENDER_STATUS_LABELS[status.trim().toLowerCase()] ?? status;
+};
+
 // ── Toggle ───────────────────────────────────────────────────────────────────
 
 const Toggle: React.FC<{ checked: boolean; disabled?: boolean; onChange: (v: boolean) => void }> = ({
@@ -331,11 +353,15 @@ export const AlgorithmRunner: React.FC = () => {
           observedRunId.current = retrainStatus.currentRun.id;
           setRecommendRunning(true);
           setRecommendProgress(retrainStatus.currentRun.metrics?.progress ?? 0);
-          setRecommendStep(retrainStatus.currentRun.metrics?.current_step ?? retrainStatus.currentRun.status);
+          setRecommendStep(
+            formatRecommenderStatus(
+              retrainStatus.currentRun.metrics?.current_step ?? retrainStatus.currentRun.status,
+            ),
+          );
         } else if (retrainStatus.latestRun) {
           const latest = retrainStatus.latestRun;
           observedRunId.current = latest.id;
-          setRecommendStep(latest.status === 'completed' ? 'Hoàn thành' : latest.status);
+          setRecommendStep(formatRecommenderStatus(latest.metrics?.current_step ?? latest.status));
           setRecommendProgress(latest.metrics?.progress ?? 0);
           if (latest.completedAt) setRecommendLastRun(formatPipelineDateTime(latest.completedAt));
         }
@@ -406,7 +432,7 @@ export const AlgorithmRunner: React.FC = () => {
           setRecommendRunning(true);
         }
         setRecommendProgress(run.metrics?.progress ?? 0);
-        setRecommendStep(run.metrics?.current_step ?? run.status);
+        setRecommendStep(formatRecommenderStatus(run.metrics?.current_step ?? run.status));
         if (run.startedAt || run.createdAt) {
           setRecommendLastRun(formatPipelineDateTime(run.startedAt ?? run.createdAt));
         }
@@ -519,7 +545,7 @@ export const AlgorithmRunner: React.FC = () => {
       const status = await algorithmPipelineAPI.runRecommenderRetrain();
       if (status.currentRun) {
         observedRunId.current = status.currentRun.id;
-        setRecommendStep(status.currentRun.metrics?.current_step ?? 'queued');
+        setRecommendStep(formatRecommenderStatus(status.currentRun.metrics?.current_step ?? 'queued'));
       }
     } catch (err: unknown) {
       setRecommendRunning(false);
